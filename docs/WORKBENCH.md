@@ -3,7 +3,7 @@
 Run `superaris` in an interactive terminal; `superaris start` without a project
 opens the same wizard. Noninteractive input/EOF exits or displays usage without
 starting a model. The wizard selects UI language, project, available clients,
-models, layout and optional task before confirmation. A new empty task waits.
+models, layout and optional task before confirmation. The three recommended presets are shortcuts; **Custom team** chooses Codex, Claude Code or Antigravity independently for main, engineer and writer. Any one installed agent client is enough for a custom team; each role has a separate session and model choice. A new empty task waits.
 UI language changes product text and new readable labels, not paper/task
 language, native client UI or skill bodies. It is saved on confirmed startup
 in the existing project binding; cancellation does not save a new preference.
@@ -20,7 +20,13 @@ answers them for you or blindly resends an unknown initial task.
 `start PROJECT --plan` previews without starting native processes. Every new
 preset defaults to main/engineer/writer: Codex/Codex/Codex, CC/Codex/CC, or
 CC/Codex/AGY. Existing and pending teams retain their original membership on
-ordinary reentry. Use `--only-role` to explicitly select a subset, as below:
+ordinary reentry. Roles are responsibilities rather than client restrictions. For example, an AGY main can coordinate CC engineering and a separate AGY writer:
+
+```bash
+superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy --plan
+```
+
+Add `--host orca` for a new Orca project, and repeat `--model ROLE=MODEL` as needed. The main role owns goals, delegation, acceptance and follow-up; engineering usually goes to the engineer, but main can also execute or code within its authorization and write scope. Changing a new-team selection does not migrate existing owners. Use `--only-role` to explicitly select a subset, as below:
 
 ```bash
 superaris start /path/to/project --session research-demo --preset cc-codex --only-role main --only-role engineer --write-scope main=notes --write-scope engineer=outputs/engineer --role-task 'engineer=Implement the assigned stage in outputs/engineer' --task 'Coordinate the existing project task' --plan

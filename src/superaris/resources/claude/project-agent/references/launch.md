@@ -50,7 +50,7 @@ updates require an explicit checkout or a future product pin change.
 
 Run `superaris` (or `superaris start` without a project) in an interactive
 terminal. First choose 简体中文 / English, then project, available client
-combination, models per role, layout and optional task. Review the summary and
+combination (three recommended presets or Custom team), models per role, layout and optional task. Review the summary and
 launch, edit or cancel. New directories are created only after confirmation;
 new empty tasks wait for the user. EOF/noninteractive input does not auto-start.
 UI language controls product text/new labels, not paper/task output or native
@@ -67,10 +67,22 @@ New projects can select Orca with `--host orca`; existing projects retain their
 bound host and team. A binding without a host field remains Herdr. Read the
 packet/navigation host instructions before workbench operations.
 
-Every new preset starts `main`, `engineer` and `writer`: `codex` maps all
+Every recommended preset starts `main`, `engineer` and `writer`: `codex` maps all
 three to Codex; `cc-codex` uses CC / Codex / CC; `cc-codex-agy` uses
 CC / Codex / AGY. Role, harness and model are separate; CC does not imply a
 particular provider. Collaborators read their own context and wait for main.
+The presets are shortcuts, not restrictions: Custom team independently selects Codex,
+CC or AGY for each role and keeps separate sessions/models. At least one installed
+agent client is enough, without requiring Codex. For example:
+
+```bash
+superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy --plan
+```
+
+Add `--host orca` for a new Orca workbench. Main owns goals, delegation,
+acceptance and follow-up; it may also execute or code within authorization and
+its write scope. CC/AGY follow-up remains visible-notice based; only verified
+dedicated Codex inputs support automatic continuation under existing guards.
 Ordinary reentry retains recorded or pending membership. Repeat `--only-role`
 to explicitly select a subset, as in this two-role example:
 

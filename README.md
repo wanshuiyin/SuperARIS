@@ -38,9 +38,9 @@ Built on [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep
 
 ## One personal agent, a persistent team
 
-Your main agent holds the research direction and coordinates the work. Codex can implement experiments and check evidence; Gemini can discuss the argument and write substantial paper sections. Each collaborator has its own ongoing session, so you can work directly with the teammate you need and continue the discussion where you left off.
+Your main agent holds the research direction and coordinates the work. Codex can implement experiments and check evidence; Gemini can discuss the argument and write substantial paper sections. The main role can also execute or code directly within its authorized scope. Each collaborator has its own ongoing session, so you can work directly with the teammate you need and continue the discussion where you left off.
 
-Every new team has three roles: main, engineer and writer. Choose an all-Codex team, Claude Code main/writer with Codex engineering, or Claude Code / Codex / Antigravity. Each role keeps its own model choice. Temporary MCP workers and fresh reviewers remain available alongside the persistent team.
+Every new team has three roles: main, engineer and writer. Recommended presets offer an all-Codex team, Claude Code main/writer with Codex engineering, or Claude Code / Codex / Antigravity. Choose **Custom team** in the wizard to assign Codex, Claude Code or Antigravity to each role independently, including an AGY main and teams without Codex. Each role keeps its own model choice and session. Temporary MCP workers and fresh reviewers remain available alongside the persistent team.
 
 ## ARIS for every teammate
 
@@ -87,11 +87,19 @@ superaris
 
 Choose the interface language, project, team, and models, then confirm the workspace. Give the main agent a task, or open the team and discuss what to do next. The interface language is independent of your paper or task language.
 
-| Team | Main | Engineer | Writer |
+| Recommended preset | Main | Engineer | Writer |
 |---|---|---|---|
 | Codex | Codex | Codex | Codex |
 | Claude Code + Codex | Claude Code | Codex | Claude Code |
 | Claude Code + Codex + Antigravity | Claude Code | Codex | Antigravity |
+
+The presets are shortcuts, not role restrictions. For example, choose AGY main, CC engineering and AGY writing in **Custom team**, or use:
+
+```bash
+superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy
+```
+
+Add `--host orca` for a new Orca project, or `--model ROLE=MODEL` for individual model requests. The two AGY roles have separate sessions. CC/AGY follow-up remains notice-based; verified dedicated Codex automation keeps its existing input guards.
 
 New workbenches use the same three-pane layout. Existing teams and pending startup choices stay intact; `--only-role` selects an explicit subset.
 

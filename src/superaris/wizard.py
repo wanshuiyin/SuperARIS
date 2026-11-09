@@ -163,6 +163,26 @@ def select_model(role: str, kind: str, previous: str | None) -> str | None:
         print(tr("请输入原生 CLI 支持的模型 ID，或 b 返回项目选择。"))
 
 
+def select_custom_roles(available: dict, previous: dict[str, str]) -> list[tuple[str, str]]:
+    kinds = list(LABELS)
+    selected = []
+    for role in ROLES:
+        options = [tr(LABELS[kind]) + (tr("（未找到，暂不可用）") if not available.get(kind) else "")
+                   for kind in kinds]
+        default = previous.get(role)
+        if not available.get(default):
+            default = next(kind for kind in kinds if available.get(kind))
+        while True:
+            choice = choose(tr("{role} — 客户端", role=ui.role_label(role)), options, kinds.index(default) + 1)
+            kind = kinds[choice - 1]
+            if available.get(kind):
+                selected.append((role, kind))
+                previous[role] = kind
+                break
+            print(tr("请选择本机已找到的客户端，或 b 返回项目选择。"))
+    return selected
+
+
 def _preview_pad(text: str, width: int) -> str:
     cells = sum(2 if unicodedata.east_asian_width(char) in {"W", "F"} else 1 for char in text)
     return text + " " * max(0, width - cells)
@@ -222,6 +242,7 @@ def run() -> Selection | None:
     if selected_path != Path.cwd().resolve():
         print(tr("当前位置是 Home 或文件系统根；建议使用独立项目目录，避免把整个目录作为写域。"))
     combo = 1
+    custom_roles = {}
     models = {}
     name = ""
     task = ""
@@ -300,16 +321,23 @@ def run() -> Selection | None:
                 missing = [tr(LABELS[kind]) for kind in dict.fromkeys(kind for _, kind in roles) if not available[kind]]
                 usable.append(not missing)
                 options.append(tr(label) + (tr("（缺少 {missing}，暂不可用）", missing=(", " if ui.language == "en" else "、").join(missing)) if missing else ""))
+            usable.append(any(available.get(kind) for kind in LABELS))
+            options.append(tr("自定义团队（分别选择三个角色的客户端）"))
             if not any(usable):
-                print(tr("当前组合均需要 Codex。请先安装缺失客户端并完成其原生登录，再运行 superaris。"))
+                print(tr("未找到可用的 Agent 客户端。请安装 Codex、Claude Code 或 Antigravity 中至少一种，并完成其原生登录。"))
                 return None
+            print(tr("前三项是推荐预设；也可自定义每个角色。"))
             default = combo if usable[combo - 1] else usable.index(True) + 1
             while True:
                 combo = choose(tr("客户端组合"), options, default)
                 if usable[combo - 1]:
                     break
                 print(tr("请先安装该组合缺少的客户端并完成原生登录，或选择本机可用组合。"))
-            _, preset, roles = COMBINATIONS[combo - 1]
+            if combo <= len(COMBINATIONS):
+                _, preset, roles = COMBINATIONS[combo - 1]
+            else:
+                preset = None
+                roles = select_custom_roles(available, custom_roles)
             chosen = {}
             for role, kind in roles:
                 value = select_model(role, kind, models.get((role, kind)))
@@ -344,7 +372,12 @@ def run() -> Selection | None:
                 continue
             if action == 3 or not ready:
                 return None
-            arguments = ["start", str(project), "--session", session_name(project), "--preset", preset, "--name", name]
+            arguments = ["start", str(project), "--session", session_name(project), "--name", name]
+            if preset:
+                arguments += ["--preset", preset]
+            else:
+                for role, kind in roles:
+                    arguments += ["--role", f"{role}={kind}"]
             if host == "orca":
                 arguments += ["--host", "orca"]
             waiting = "Read this project's role packet and selected ARIS skills, then wait for the user's concrete task. Do not start a research pipeline, workflow, model delegation or Goal."

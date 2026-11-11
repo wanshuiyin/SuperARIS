@@ -12,7 +12,7 @@ from urllib.request import urlopen
 from .platform import FileLock
 
 
-ARIS_COMMIT = "2901234ad2954cd2388ced8d3aed2ed9de42803a"
+ARIS_COMMIT = "8f493923f28c3f991dcca1287db97aa780d0969b"
 ARIS_URL = f"https://codeload.github.com/wanshuiyin/Auto-claude-code-research-in-sleep/tar.gz/{ARIS_COMMIT}"
 
 

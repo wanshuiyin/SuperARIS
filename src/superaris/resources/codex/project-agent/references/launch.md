@@ -20,7 +20,7 @@ credentials requests, global skills installation or model/MCP rewrites are neede
 
 The package bundles this project-agent resource. Other ARIS skills, catalogs,
 shared references and helpers come from public MIT-licensed ARIS commit
-`2901234ad2954cd2388ced8d3aed2ed9de42803a`, fetched lazily only when confirmed
+`8f493923f28c3f991dcca1287db97aa780d0969b`, fetched lazily only when confirmed
 startup or context preparation needs it. The cache is
 `$XDG_CACHE_HOME/superaris/aris/<commit>`, falling back to
 `~/.cache/superaris/aris/<commit>`. Help, plan and canceled chooser flows do not

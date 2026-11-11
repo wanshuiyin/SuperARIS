@@ -42,6 +42,34 @@ Acknowledgement requires an existing evidence file and does not grant scientific
 PASS. Keep the handle active while still waiting. Unknown delivery uses
 [explicit readback resolution](WORKBENCH.md#input-ownership), not blind retries.
 
+## SSH results
+
+Assign remote experiment work to the existing engineer with its SSH host,
+authorized remote directory, user-confirmed environment/working command, first
+small real experiment, local result/log paths and original sync/status entry in
+the task record. Main actually dispatches and checks that first result; writer
+waits for accepted facts. Main can still execute or code within its authority.
+Reuse the existing environment and entry, applying the original experiment
+skill's checks to actual changes.
+
+Use the `watch` → `report` chain above for the returned local artifacts. The
+receiver observes its host's registered files and reports; it does not watch
+arbitrary SSH paths, execute `--query` or copy remote files. If the whole team
+runs remotely, its project/receiver paths refer to that host. The original
+worker must synchronize the actual result and command/exit-status log through
+the project's existing entry. A remote-only result or `completed` report is not
+acceptance; if retrieval is blocked, report `blocked` or `reply` with the
+original query pointer and retain the wait.
+
+Carry prior failures, attempted fixes and the remaining agreed budget across
+skills and handoffs. When the task's attempts are exhausted or the same blocker
+repeats without progress, hand main the actual error and next viable path;
+do not restart the same costly preparation or rewrite training code merely
+because of an external permission/network/authentication/driver failure.
+Original skill retry/acceptance limits, CC/AGY notices, dedicated Codex input
+guards and MCP protocols remain. This introduces no timer, price threshold,
+automatic model change or new task ledger.
+
 ## Existing memory, explicit events
 
 The authorized owner can update its original records directly or append an event:

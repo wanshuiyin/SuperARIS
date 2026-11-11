@@ -85,6 +85,42 @@ wait and points to an existing evidence file. Neither declares scientific PASS.
 Keep the handle open while more evidence is expected. Do not blindly replay a
 write or paid model call after an uncertain delivery.
 
+## SSH results
+
+Use the original task record to make the remote execution and local receipt
+explicit. For example, adapt these fields to the already authorized project:
+
+- **Owner:** the existing engineer; main assigns and accepts the work, writer
+  waits for verified results.
+- **Remote:** SSH alias `research-box`, authorized directory `/srv/research/study`,
+  existing environment `/srv/envs/study/bin/python` and the project's known
+  small-run command recorded in `notes/WORK.md`. Reuse that entry rather than
+  rebuilding an environment just because product metadata is absent.
+- **First milestone:** one smallest real experiment with its actual command,
+  exit status, run log and result; an environment import alone is not that result.
+- **Receipt:** remote artifacts returned to `outputs/engineer/smoke/RESULT.md`
+  and `outputs/engineer/smoke/run.log` in the selected project, through the
+  existing artifact-sync entry recorded in the same task. Retain the original
+  SSH/job status or MCP continuation entry and the agreed troubleshooting limit.
+
+Register the local wait before dispatching that work package:
+
+```bash
+superaris watch /path/to/project --id ssh-smoke --owner-role main --worker-role engineer --record notes/WORK.md --deliverable outputs/engineer/smoke/RESULT.md --deliverable outputs/engineer/smoke/run.log --wait-for 'First real experiment, synced result and command/exit-status log' --query 'engineer: original SSH/job status entry in notes/WORK.md' --next 'Verify the actual files and first experiment against notes/WORK.md, then continue the authorized stage'
+
+# Engineer: after the existing sync entry has returned the actual local files.
+superaris report /path/to/project --id ssh-smoke --outcome completed --message 'Result and run log synced to outputs/engineer/smoke; inspect the command, exit status and original checks'
+```
+
+The receiver observes registered files on its own host and explicit reports;
+it does not watch arbitrary SSH files, run `--query`, or synchronize artifacts.
+A result remaining only on the remote machine needs the existing worker's
+sync/status action. If it cannot be returned, report `blocked` or `reply` with
+the remote evidence and original query entry; main still needs actual evidence
+before acceptance. Reports, native idle and notices alone are not completion.
+CC/AGY follow-up remains visible-notice based; dedicated Codex automatic inputs
+retain their original permission and draft guards.
+
 ## Hand off input and resolve uncertain delivery
 
 ```bash

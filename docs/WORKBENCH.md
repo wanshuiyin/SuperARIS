@@ -44,6 +44,13 @@ remain different responsibilities. No requirement routes every MCP job into a
 pane. New three-role workbenches place the owner left, engineer upper right and
 writer lower right; adopted owner topology is preserved.
 
+For SSH work, role write scopes refer to file ownership on the project host;
+they do not require a new OS sandbox. Record the authorized remote host/path
+and the existing environment in the original task separately. An existing
+engineer owns remote setup and returns the first real result/log through the
+project's original synchronization entry. See [SSH results](RESULTS_AND_MEMORY.md#ssh-results)
+for receipt and troubleshooting handoff boundaries.
+
 ## Input ownership
 
 Human-owned roles receive visible notices by default. `start --automation-owned`

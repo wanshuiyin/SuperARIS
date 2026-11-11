@@ -34,6 +34,12 @@ superaris
 
 使用 Orca 前，先安装并打开[官方应用](https://www.onorca.dev/)；若 CLI 不可用，在 **Settings → General → Orca CLI** 注册命令。已有项目重入时保留原工作台与团队。[更多安装方式 ↓](#安装与启动)
 
+## 近期更新
+
+- **2026-11-09** — 自定义各角色的客户端与模型，支持 AGY 主控及无 Codex 团队（[#2](https://github.com/wanshuiyin/SuperARIS/pull/2)）。
+- **2026-11-09** — 用 `superaris usage` 按角色与客户端查看本地用量（[#1](https://github.com/wanshuiyin/SuperARIS/pull/1)、[指南](docs/USAGE.md)）。
+- **2026-11-09** — 可选 Orca 工作台，切换多模型／三 Codex 团队演示（[安装](docs/ORCA.md)、[交互演示](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench)）。
+
 和你的个人 Agent 讨论科研目标，让它组织团队、分配工作、核验成果，并跟进下一步。想深入讨论一个想法、共同修改一段正文，或亲自接手时，直接进入相应成员的会话。
 
 SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep)（Auto Research In Sleep，约 2 万 GitHub stars），为每个角色提供所需的科研流程与项目上下文。团队围绕同一个项目持续协作，分工清楚，研究记录随项目保存，明天回来还能接着做。

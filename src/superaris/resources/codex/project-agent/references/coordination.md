@@ -45,6 +45,36 @@ budgets. A persistent author can continue; a fresh reviewer must still be fresh.
 Codex reviewing Codex records `review_independence: same-family` and
 `acceptance_status: provisional` where applicable.
 
+## Delegate an SSH experiment
+
+For an authorized remote experiment, give the existing engineer one concrete
+work package before starting prolonged setup; keep the writer waiting for
+verified facts. Record the SSH host alias, authorized remote directory, existing
+user-confirmed environment and run command, first small real experiment,
+local deliverable paths, original sync/status entry and budget/stop condition in
+the original task. Reuse the environment and working entry; apply the original
+experiment skill's checks when an actual environment or execution change needs
+them. Main collects and verifies the first command, exit status, log and result;
+it may still execute or code directly when needed and authorized.
+
+Write scopes describe file ownership on the machine running the project, not a
+requirement to build OS sandboxes. When the whole team runs remotely, that
+machine is its local host. Authorize the SSH target and remote writes in the
+same task; do not confuse a remote directory with a local `--write-scope`.
+One engineer owns shared remote setup changes; other roles should not configure
+the same environment concurrently. See [SSH results](receipts.md#ssh-results)
+for bringing remote evidence back to the original receiver.
+
+Carry failed commands, repair attempts and the remaining agreed budget through
+child skills and handoffs; changing skills does not reset them. When the task's
+allowed attempts are exhausted or the same blocker repeats without new
+progress, stop repeating expensive preparation. Hand main the actual error,
+last command/exit status, attempted fixes and next viable path so it can take
+over or re-scope. An external permission, network, authentication or driver
+failure alone is not a reason to rewrite training code. Keep the original
+skill's sanity/reimplementation limits and scientific acceptance gates; this
+adds no price threshold, automatic model downgrade or background monitor.
+
 ## Receive and continue while the project runs
 
 Use an existing native callback when it supplies real completion/failure

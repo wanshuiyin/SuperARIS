@@ -36,6 +36,7 @@ superaris
 
 ## 近期更新
 
+- **2026-11-11** — 完善 SSH 实验派工、里程碑验收和排障收口；默认 ARIS 版本已纳入代码／配置同步与已有环境复用修复（[#3](https://github.com/wanshuiyin/SuperARIS/pull/3)、[ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)）。
 - **2026-11-09** — 自定义各角色的客户端与模型，支持 AGY 主控及无 Codex 团队（[#2](https://github.com/wanshuiyin/SuperARIS/pull/2)）。
 - **2026-11-09** — 用 `superaris usage` 按角色与客户端查看本地用量（[#1](https://github.com/wanshuiyin/SuperARIS/pull/1)、[指南](docs/USAGE.md)）。
 - **2026-11-09** — 可选 Orca 工作台，切换多模型／三 Codex 团队演示（[安装](docs/ORCA.md)、[交互演示](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench)）。

@@ -40,6 +40,8 @@ superaris
 - **2026-11-09** — 用 `superaris usage` 按角色与客户端查看本地用量（[#1](https://github.com/wanshuiyin/SuperARIS/pull/1)、[指南](docs/USAGE.md)）。
 - **2026-11-09** — 可选 Orca 工作台，切换多模型／三 Codex 团队演示（[安装](docs/ORCA.md)、[交互演示](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench)）。
 
+## 项目简介
+
 和你的个人 Agent 讨论科研目标，让它组织团队、分配工作、核验成果，并跟进下一步。想深入讨论一个想法、共同修改一段正文，或亲自接手时，直接进入相应成员的会话。
 
 SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep)（Auto Research In Sleep，约 2 万 GitHub stars），为每个角色提供所需的科研流程与项目上下文。团队围绕同一个项目持续协作，分工清楚，研究记录随项目保存，明天回来还能接着做。

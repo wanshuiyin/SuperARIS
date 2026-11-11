@@ -19,7 +19,9 @@ SuperARIS bundles its Claude Code/Codex project-agent resources. ARIS supplies
 research skills, shared references, catalogs and canonical helpers. The default
 public source is [Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep)
 at MIT-licensed commit
-[`2901234ad2954cd2388ced8d3aed2ed9de42803a`](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/tree/2901234ad2954cd2388ced8d3aed2ed9de42803a).
+[`8f493923f28c3f991dcca1287db97aa780d0969b`](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/tree/8f493923f28c3f991dcca1287db97aa780d0969b).
+This pin includes the SSH synchronization and environment-reuse fixes merged in
+[ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497).
 
 When confirmed startup or context preparation needs that source, the product
 lazily downloads it to `$XDG_CACHE_HOME/superaris/aris/<commit>` or

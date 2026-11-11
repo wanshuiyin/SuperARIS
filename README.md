@@ -32,6 +32,14 @@ For an explicit start, open a new project's directory and choose one workbench:
 
 For Orca, install and open the [official app](https://www.onorca.dev/) first; if its CLI is unavailable, register it in **Settings → General → Orca CLI**. Reopening an existing project keeps its recorded workbench and team. [More installation options ↓](#install-and-open)
 
+## News
+
+- **2026-11-09** — Choose each role's client and model with Custom team, including AGY-led teams without Codex ([#2](https://github.com/wanshuiyin/SuperARIS/pull/2)).
+- **2026-11-09** — Inspect local usage by role and client with `superaris usage` ([#1](https://github.com/wanshuiyin/SuperARIS/pull/1), [guide](docs/USAGE.md)).
+- **2026-11-09** — Use the optional Orca workbench and compare multi-model / three-Codex demos ([setup](docs/ORCA.md), [interactive demo](https://wanshuiyin.github.io/SuperARIS/?host=orca#workbench)).
+
+## Overview
+
 Discuss a research goal with your personal agent. It organizes a persistent team, delegates work, checks incoming results, and keeps track of what should happen next. Join any teammate's session to explore an idea, refine a draft, or take over.
 
 Built on [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) (Auto Research In Sleep, ~20k GitHub stars), SuperARIS equips each role with the research workflows and project context it needs. The team works within one project, with clear responsibilities and a record you can return to tomorrow.

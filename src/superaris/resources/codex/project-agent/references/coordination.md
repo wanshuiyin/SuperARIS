@@ -57,6 +57,15 @@ experiment skill's checks when an actual environment or execution change needs
 them. Main collects and verifies the first command, exit status, log and result;
 it may still execute or code directly when needed and authorized.
 
+At key milestones, have the engineer return a compact evidence package:
+changed artifacts, actual command/exit status, result summary and original log
+pointers, including prior validation that still applies. Main inspects the raw
+evidence needed for the current acceptance question and reuses unchanged,
+verified results; do not reread entire logs or recompute identical checksums
+without a new change or question. Keep independent acceptance and the project's
+required information isolation. If that isolation cannot run with available
+permissions, escalate the requirement or prerequisite rather than bypass it.
+
 Write scopes describe file ownership on the machine running the project, not a
 requirement to build OS sandboxes. When the whole team runs remotely, that
 machine is its local host. Authorize the SSH target and remote writes in the

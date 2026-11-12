@@ -63,12 +63,16 @@ def make_plan(args: argparse.Namespace) -> dict:
     remembered = ({item["role"]: item for item in pending.get("roles", [])}
                   if pending else current.get("roles", {}))
     preset = args.preset or current.get("preset", "codex")
-    # New defaults do not migrate an existing or unfinished team. An explicit
-    # role selection (or a different preset) is the existing opt-in expansion.
-    retain_team = bool(remembered) and not args.role and args.only_role is None and (
+    # Ordinary reentry retains membership. Selecting roles can add preset
+    # members without replacing the choices recorded for existing members.
+    retain_team = bool(remembered) and not args.role and (
         args.preset is None or args.preset == current.get("preset"))
     roles = ({role: record["harness"] for role, record in remembered.items()}
              if retain_team else {**PRESETS[preset], **assignments(args.role)})
+    if retain_team and args.only_role is not None:
+        for role in args.only_role:
+            if role in PRESETS[preset]:
+                roles.setdefault(role, PRESETS[preset][role])
     inherited = remembered if retain_team else {}
     models = {role: record.get("model", record.get("requested_model"))
               for role, record in inherited.items()}

@@ -1223,6 +1223,37 @@
       color: var(--text-secondary);
     }
 
+    /* Bilingual technical diagrams */
+    .mechanisms { margin-top: 28px; }
+    .mechanism-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 12px;
+    }
+    .mechanism-heading h2 { font-size: 18px; font-weight: 600; }
+    .mechanism-guide { font-size: 13px; color: var(--text-secondary); text-decoration: underline; text-underline-offset: 3px; }
+    .mechanism-figure {
+      max-width: 1182px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid #dce5de;
+      border-radius: 10px;
+      background: #fff;
+      color: #354d3e;
+    }
+    .mechanism-image-link { display: block; cursor: zoom-in; }
+    .mechanism-figure img { display: block; width: 100%; height: auto; }
+    .mechanism-figure figcaption {
+      padding: 12px 16px;
+      border-top: 1px solid #e3ebe5;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .mechanism-original { display: inline-block; color: #18713d; text-decoration: underline; text-underline-offset: 3px; }
+
     /* Footer */
     .page-footer {
       margin-top: 28px;
@@ -1977,6 +2008,19 @@
       </div>
     </section>
 
+    <section class="mechanisms" id="mechanisms" aria-labelledby="mechanism-title">
+      <div class="mechanism-heading">
+        <h2 id="mechanism-title" data-i18n="mechanism_title">Follow-through &amp; project memory</h2>
+        <a class="mechanism-guide" href="https://github.com/wanshuiyin/SuperARIS/blob/main/docs/RESULTS_AND_MEMORY.md" data-i18n="mechanism_guide">Receiving &amp; project memory guide ↗</a>
+      </div>
+      <figure class="mechanism-figure">
+        <a class="mechanism-image-link" data-mechanism-original href="media/superaris-mechanisms-en.png" target="_blank" rel="noopener">
+          <img id="mechanism-diagram" src="media/superaris-mechanisms-en.png" width="1182" height="1331" loading="lazy" decoding="async" alt="SuperARIS mechanisms: team and MCP reports return to the original main for evidence-based follow-through; editable project notes, research wiki and task records restore context." />
+        </a>
+        <figcaption><span data-i18n="mechanism_caption">Reports return to the original main; project files carry decisions, evidence and next steps into the next session.</span> <a class="mechanism-original" data-mechanism-original href="media/superaris-mechanisms-en.png" target="_blank" rel="noopener" data-i18n="mechanism_zoom">Open full-size diagram ↗</a></figcaption>
+      </figure>
+    </section>
+
     <footer class="page-footer">
       <div>SuperARIS — Built on <a href="https://herdr.dev">Herdr</a> &amp; <a href="https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep">ARIS</a>.</div>
       <div><a href="https://github.com/wanshuiyin/SuperARIS/blob/main/LICENSE">MIT License</a> · SuperARIS</div>
@@ -2007,6 +2051,11 @@
           mcp_title: "⚡ Background reviewer · Fresh context",
           mcp_body: "Read <code>paper/method.tex</code> alongside <code>results/table1.json</code>. The reviewer asks for a clearer uncertainty statement; Gemini revises it and Codex checks the values.",
           link_pipeline:"Full pipeline",link_ideas:"Ideas",link_experiments:"Experiments",link_review:"Review",link_writing:"Writing",link_guide:"Project guide ↗",fresh_context:"Fresh context",record_title:"Project record",review_toggle:"Background review",theme_dark:"Dark",theme_warm:"Warm",replay:"↺ Replay",demo_note:"Interactive walkthrough · illustrative project and data. Models and roles are configurable.",install_note:"Python 3.10+ · macOS / Linux / Windows · Choose Herdr or Orca and your native CLIs. Install & guide →",
+          mechanism_title: "Follow-through & project memory",
+          mechanism_guide: "Receiving & project memory guide ↗",
+          mechanism_caption: "Reports return to the original main; project files carry decisions, evidence and next steps into the next session.",
+          mechanism_zoom: "Open full-size diagram ↗",
+          mechanism_alt: "SuperARIS mechanisms: team and MCP reports return to the original main for evidence-based follow-through; editable project notes, research wiki and task records restore context.",
           history_label: "Earlier in this session"
         },
         zh: {
@@ -2027,6 +2076,11 @@
           mcp_title: "⚡ 后台 reviewer · 全新上下文",
           mcp_body: "对照读取 <code>paper/method.tex</code> 与 <code>results/table1.json</code>。reviewer 提醒补全不确定性说明，Gemini 修订表述，Codex 核对数值。",
           link_pipeline:"完整科研",link_ideas:"选题",link_experiments:"实验",link_review:"评审",link_writing:"论文",link_guide:"项目指南 ↗",fresh_context:"全新上下文",record_title:"项目记录",review_toggle:"后台 review",theme_dark:"深色",theme_warm:"暖米",replay:"↺ 重播",demo_note:"交互演示 · 示例项目与数据。模型与分工可按需配置。",install_note:"Python 3.10+ · macOS / Linux / Windows · 选择 Herdr 或 Orca 与所需原生 CLI。安装与指南 →",
+          mechanism_title: "主动协作与项目记忆",
+          mechanism_guide: "收件与项目记忆指南 ↗",
+          mechanism_caption: "交付回到原主 Agent；项目文件保存决定、证据与下一步，让后续会话接着推进。",
+          mechanism_zoom: "查看原图，可放大 ↗",
+          mechanism_alt: "SuperARIS 双面板机制图：常驻团队与 MCP 交付经接收器回到原主 Agent 验收接续；可编辑的项目笔记、research wiki 和任务记录在恢复时读回。",
           history_label: "本轮会话前序记录"
         }
       };
@@ -2934,6 +2988,14 @@
         document.querySelectorAll("[data-i18n]").forEach(function (el) {
           const key = el.getAttribute("data-i18n");
           if (dict[key]) el.textContent = dict[key];
+        });
+
+        const mechanismImage = document.getElementById("mechanism-diagram");
+        mechanismImage.src = "media/superaris-mechanisms-" + lang + ".png";
+        mechanismImage.alt = dict.mechanism_alt;
+        mechanismImage.height = lang === "zh" ? 1330 : 1331;
+        document.querySelectorAll("[data-mechanism-original]").forEach(function (link) {
+          link.href = mechanismImage.src;
         });
 
         document.getElementById("hero-subtitle").textContent = dict.hero_subtitle;

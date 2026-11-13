@@ -87,6 +87,11 @@ def test_role_preparation_uses_native_sources_and_current_inputs_without_touchin
     assert prepared["delivered"] is False
     assert prepared["assignment_changed"] is False
     assert {"project-agent", "native-custom"} <= prepared["skill_index"].keys()
+    references = Path(prepared["skill_index"]["project-agent"]).parent / "references"
+    for name in ("launch.md", "receipts.md", "coordination.md"):
+        guidance = (references / name).read_text()
+        assert "Herdr AGY" in guidance and "Orca AGY" in guidance
+        assert "verified" in guidance and "control" in guidance
     copied = Path(prepared["skill_index"]["native-custom"])
     assert copied.read_bytes() == custom_before
     packet = Path(prepared["packet"])

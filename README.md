@@ -70,7 +70,7 @@ These use your configured tools and keep ARIS's review and acceptance criteria. 
 
 SuperARIS tracks registered tasks, result files, and reports while the original main session is running—even after you close the workbench window. Your main agent uses those updates to collect finished work, check the evidence, and continue the next authorized step.
 
-Human-controlled sessions receive notices; dedicated Codex sessions can use automatic follow-up. [Receiving results and continuing work →](docs/RESULTS_AND_MEMORY.md)
+Human-controlled sessions receive notices. Explicitly automation-owned Codex sessions and Herdr AGY sessions can continue automatically when idle with a verified empty input; CC and Orca AGY use notices. [Receiving results and continuing work →](docs/RESULTS_AND_MEMORY.md)
 
 [![SuperARIS proactive collaboration: team and MCP reports reach the receiver, the original main agent verifies results and continues authorized work, and project records support recovery (Chinese labels).](assets/proactive-mechanism-zh.png)](assets/proactive-mechanism-zh.png)
 
@@ -109,7 +109,7 @@ The presets are shortcuts, not role restrictions. For example, choose AGY main, 
 superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy
 ```
 
-Add `--host orca` for a new Orca project, or `--model ROLE=MODEL` for individual model requests. The two AGY roles have separate sessions. CC/AGY follow-up remains notice-based; verified dedicated Codex automation keeps its existing input guards.
+Add `--host orca` for a new Orca project, or `--model ROLE=MODEL` for individual model requests. The two AGY roles have separate sessions. CC and Orca AGY follow-up remains notice-based. On Herdr, explicitly automation-owned AGY can continue through its verified empty idle composer, alongside existing guarded Codex automation.
 
 New workbenches use the same three-pane layout. Existing teams and pending startup choices stay intact; `--only-role` selects an explicit subset.
 

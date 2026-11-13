@@ -133,8 +133,9 @@ Use [receipts.md](receipts.md) for the confirmed CLI chain, original-record
 pointers, the project/original-main-bound receiver and explicit `remember` events. The CLI
 never parses arbitrary Markdown into tasks, infers memory updates or replaces
 MCP-specific query/status protocols. Human-owned roles default to visible
-notices; dedicated automation's Codex surface guard is not atomic human-input
-protection. These behaviors and the complete three-host native validation are
+notices. Explicitly automation-owned Codex and Herdr AGY can continue when
+idle with a verified empty input; CC and Orca AGY remain notice-based. These
+input guards are best effort, not atomic human-input protection. These behaviors and the complete three-host native validation are
 separate claims; a preset or offline plan does not prove all hosts were tested.
 
 Use explicit `control` for a persisted human/automation handoff; startup's

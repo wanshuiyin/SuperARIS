@@ -65,7 +65,9 @@ handle remains in the record.
 with acceptance unevaluated. Inspect real files, command outcomes and completed
 reviewer replies before acting. The default human-owned role receives a visible
 notice; it does not automatically execute the next step. `--automation-owned`
-is an explicit startup option for dedicated automation roles. The Codex delivery
+is an explicit startup option for new dedicated automation roles; use `control`
+for an existing role. Codex and Herdr AGY can receive automatic follow-up when
+the original owner is idle and its verified input is empty. The delivery
 surface check is a best-effort guard, not atomic protection against concurrent
 human typing; keep humans out of dedicated automation panes. An uncertain or
 human-owned input state remains notice-only. Do not count notification as an
@@ -118,8 +120,9 @@ A result remaining only on the remote machine needs the existing worker's
 sync/status action. If it cannot be returned, report `blocked` or `reply` with
 the remote evidence and original query entry; main still needs actual evidence
 before acceptance. Reports, native idle and notices alone are not completion.
-CC/AGY follow-up remains visible-notice based; dedicated Codex automatic inputs
-retain their original permission and draft guards.
+CC and Orca AGY follow-up remains visible-notice based. Dedicated Codex and
+Herdr AGY automatic inputs retain the original ownership, permission and draft
+guards; an unknown outcome is inspected rather than resent.
 
 ## Hand off input and resolve uncertain delivery
 

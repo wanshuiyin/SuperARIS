@@ -13,7 +13,7 @@ from pathlib import Path
 import time
 
 from .client import Herdr, HerdrError, verify_owner
-from .delivery import deliver
+from .delivery import automatic_input_supported, deliver
 from .runtime import binding
 from .state import directory, read, write
 from .hosts import client_for_binding, selected_host
@@ -156,7 +156,7 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
         changed = False
         for identifier, signal in list(deferred.items()):
             owner = bound["roles"].get(signal.get("owner_role") or "main", {})
-            if not owner.get("automation_owned") or owner.get("harness") != "codex" or not _signal_current(project, signal):
+            if not owner.get("automation_owned") or not automatic_input_supported(client, owner) or not _signal_current(project, signal):
                 del deferred[identifier]
                 changed = True
         if changed:
@@ -182,7 +182,7 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
                 result.setdefault("pending", []).append({"id": signal_id, "reason": f"Unbound owner role: {role_name}"})
                 continue
             previous = delivered.get(signal_id, {})
-            automation = role.get("automation_owned") and role.get("harness") == "codex"
+            automation = role.get("automation_owned") and automatic_input_supported(client, role)
             if signal.get("context_role") and not previous and automation:
                 # Runtime has already displayed this context's notice.
                 previous = {"signal": signal, "pane_id": role["pane_id"], "delivery": "visible_notice"}

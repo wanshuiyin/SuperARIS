@@ -16,6 +16,33 @@ def empty_codex_input(text: str) -> bool:
     return codex_input(text) in {"", "Ask Codex to do anything"}
 
 
+def automatic_input_supported(client, role: dict) -> bool:
+    return role.get("harness") == "codex" or (
+        role.get("harness") == "agy" and getattr(client, "host", None) != "orca")
+
+
+def agy_input(text: str) -> str | None:
+    """Read the idle AGY composer, including every line of a pending draft."""
+    clean = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", text)
+    lines = clean.splitlines()
+    borders = [index for index, line in enumerate(lines) if re.fullmatch(r"\s*─{3,}\s*", line)]
+    if len(borders) < 2:
+        return None
+    top, bottom = borders[-2:]
+    footer = "\n".join(lines[bottom + 1:]).strip()
+    body = lines[top + 1:bottom]
+    if (not footer.startswith("? for shortcuts") or any(line.lstrip().startswith(">") for line in lines[bottom + 1:])
+            or not body or not body[0].lstrip().startswith(">")):
+        return None
+    return "\n".join([body[0].lstrip()[1:].strip(), *[line.strip() for line in body[1:]]]).strip()
+
+
+def empty_agy_input(text: str) -> bool:
+    value = agy_input(text)
+    return value is not None and " ".join(value.split()) in {
+        "", "Auto mode: edits & safe commands auto-approved (shift+tab to cycle)"}
+
+
 def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
     live = verify_owner(client, role, project)
     from .runtime import binding
@@ -24,13 +51,18 @@ def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
     # Honor a handoff that happened after the receiver's earlier snapshot.
     automation = role.get("automation_owned") and (role.get("_initial_bootstrap") or persisted is None or persisted.get("automation_owned"))
     revoke = False
-    if automation and live["harness"] == "codex" and live["status"] in {"idle", "done"}:
+    if automation and automatic_input_supported(client, live) and live["status"] in {"idle", "done"}:
         view = read_screen(client, live["pane_id"])
-        if empty_codex_input(view):
+        parser = agy_input if live["harness"] == "agy" else codex_input
+        empty = empty_agy_input if live["harness"] == "agy" else empty_codex_input
+        if empty(view):
             # Recheck the occupant/status after reading. This is a dedicated automation
             # session, not a guarantee against a human concurrently typing after the read.
             second = verify_owner(client, live, project)
-            if second["status"] in {"idle", "done"}:
+            current = binding(project).get("roles", {})
+            current_owner = next((record for record in current.values() if record.get("pane_id") == second["pane_id"]), None)
+            still_owned = role.get("_initial_bootstrap") or current_owner is None or current_owner.get("automation_owned")
+            if second["status"] in {"idle", "done"} and still_owned:
                 native_receipt = send_prompt(client, second["pane_id"], prompt)
                 receipt = {"delivery": "submitted", "pane_id": second["pane_id"], "acceptance": "not_evaluated"}
                 if getattr(client, "host", None) == "orca":
@@ -39,7 +71,7 @@ def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
         else:
             # A startup splash without a composer is not a human draft.
             # Wait for the known input surface; never type into the splash.
-            revoke = codex_input(view) is not None
+            revoke = parser(view) is not None
     ui_language = binding(project).get("ui_language")
     if ui_language in {"zh", "en"}:
         from .ui import tr

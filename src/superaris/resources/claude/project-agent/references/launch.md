@@ -81,8 +81,10 @@ superaris start /path/to/project --role main=agy --role engineer=claude --role w
 
 Add `--host orca` for a new Orca workbench. Main owns goals, delegation,
 acceptance and follow-up; it may also execute or code within authorization and
-its write scope. CC/AGY follow-up remains visible-notice based; only verified
-dedicated Codex inputs support automatic continuation under existing guards.
+its write scope. Explicitly automation-owned Codex and Herdr AGY roles support
+automatic continuation when idle with a verified empty input. CC and Orca AGY
+follow-up remains visible-notice based. Use the existing `control` handoff or
+new-role `--automation-owned` option; choosing AGY alone grants no automation.
 Ordinary reentry retains recorded or pending membership. Repeat `--only-role`
 to explicitly select a subset, as in this two-role example:
 

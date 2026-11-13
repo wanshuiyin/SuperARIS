@@ -183,7 +183,8 @@ def test_actual_wizard_each_combination_asks_three_models_previews_mapping_and_c
         for name in ("main", "engineer", "writer"):
             assert f"selected-{name}-model" in term.text
         if choice == "1":
-            assert "CC/AGY 收到后续结果" not in term.text
+            assert "CC 收到后续结果" not in term.text
+            assert "AGY 默认通过通知收件" not in term.text
         term.line("3")
         assert term.finish() == 0, term.text
         assert not project.exists()

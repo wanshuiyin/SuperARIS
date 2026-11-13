@@ -27,7 +27,11 @@ It stops on main identity ending/changing, Herdr unavailability or explicit stop
 It creates no new owner and does not rebuild the server. `--no-receiver` persists
 an opt-out; `receiver --action start` explicitly re-enables it. Manual `listen`
 is a bounded diagnostic and refuses a second receiver while the managed one is
-active. Human-owned inputs get notices, not automatic execution.
+active. Human-owned inputs receive notices. With explicit automation ownership,
+Codex and Herdr AGY can receive automatic follow-up when the original owner is
+idle and its verified input is empty; CC and Orca AGY remain notice-based.
+Use the existing [control handoff](WORKBENCH.md#input-ownership) to change input
+ownership. A draft revokes automation; clearing it alone does not re-enable it.
 
 After a disconnect, inspect actual handles and files before repeating writes or
 paid calls. A deferred prompt must not override newer task/owner evidence.
@@ -66,8 +70,8 @@ skills and handoffs. When the task's attempts are exhausted or the same blocker
 repeats without progress, hand main the actual error and next viable path;
 do not restart the same costly preparation or rewrite training code merely
 because of an external permission/network/authentication/driver failure.
-Original skill retry/acceptance limits, CC/AGY notices, dedicated Codex input
-guards and MCP protocols remain. This introduces no timer, price threshold,
+Original skill retry/acceptance limits, human/CC/Orca AGY notices, guarded
+automation for Codex and Herdr AGY, and MCP protocols remain. This introduces no timer, price threshold,
 automatic model change or new task ledger.
 
 ## Existing memory, explicit events

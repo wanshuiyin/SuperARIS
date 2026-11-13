@@ -72,7 +72,7 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 项目运行期间，SuperARIS 跟踪已登记的任务、结果文件和交付报告。原主会话仍在运行时，关闭工作台窗口也不打断跟进。主 Agent 根据这些更新收回完成的工作、核对证据，再推进下一项已授权步骤。
 
-人工掌控的会话通过通知收件；专门交给自动化的 Codex 会话可以自动接收后续提示。[收件与工作接续 →](docs/RESULTS_AND_MEMORY.md)
+人工掌控的会话通过通知收件；显式交给自动化的 Codex 和 Herdr AGY 会话，在空闲且已验证输入框为空时可自动接续。CC 与 Orca AGY 仍通过通知收件。[收件与工作接续 →](docs/RESULTS_AND_MEMORY.md)
 
 [![SuperARIS 主动协作机制：常驻团队与 MCP 交付，经 receiver 通知原主 Agent 验收与推进，并记录项目进度以供恢复。](assets/proactive-mechanism-zh.png)](assets/proactive-mechanism-zh.png)
 
@@ -111,7 +111,7 @@ superaris
 superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy
 ```
 
-新 Orca 项目加 `--host orca`，各角色请求模型用 `--model ROLE=MODEL`。两个 AGY 角色是独立会话。CC/AGY 后续收件仍通过可见通知，专用 Codex 自动化会话保留原有输入保护。
+新 Orca 项目加 `--host orca`，各角色请求模型用 `--model ROLE=MODEL`。两个 AGY 角色是独立会话。CC 与 Orca AGY 后续收件仍通过可见通知；Herdr 中显式交给自动化的 AGY 可在已验证的空闲空输入框接续，Codex 自动化会话保留原有输入保护。
 
 新工作台采用相同的三窗格布局；已有团队和待完成启动保持原选择，`--only-role` 可明确选择子集。
 

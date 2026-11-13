@@ -63,10 +63,12 @@ for receipt and troubleshooting handoff boundaries.
 ## Input ownership
 
 Human-owned roles receive visible notices by default. `start --automation-owned`
-marks new dedicated roles only; it never elevates an adopted owner. Only the
-verified Codex input surface supports automatic follow-up submission in this
-preview. The guard is best effort; it is not atomic against concurrent typing.
-CC/AGY follow-up remains notice-based.
+marks new dedicated roles only; it never elevates an adopted owner. Explicitly
+automation-owned Codex roles and Herdr AGY roles support automatic follow-up
+when the original owner is idle and its verified input is empty. Herdr AGY uses
+the existing live TUI and receiver; it does not start a second headless writer.
+CC and Orca AGY follow-up remain notice-based. The input guard is best effort,
+not atomic against concurrent human typing.
 
 ```bash
 superaris control /path/to/project --role main --mode human

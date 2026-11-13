@@ -367,8 +367,11 @@ def run() -> Selection | None:
                 print(f"  {ui.role_label(role)} / {tr(LABELS[kind])} / {chosen[role] or tr('沿用 CLI 配置')} → {scope}")
             print(tr("任务：{task}", task=task or tr("暂不安排，进入后再告诉主会话")))
             print(tr("将打开所选工作台，加载项目与 ARIS 技能，并接收协作者后续结果。"))
-            if any(kind in {"claude", "agy"} for _, kind in roles):
-                print(tr("CC/AGY 收到后续结果时会提示你查看。"))
+            if any(kind == "claude" for _, kind in roles):
+                print(tr("CC 收到后续结果时会提示你查看。"))
+            if any(kind == "agy" for _, kind in roles):
+                print(tr("AGY 默认通过通知收件；Herdr 中显式交给自动化后，可在已验证的空闲空输入框接续。")
+                      if host == "herdr" else tr("Orca 中的 AGY 收到后续结果时会提示你查看。"))
             ready = dependency_summary(available, host)
             action = choose(tr("请选择"), [tr("启动"), tr("返回修改"), tr("取消")])
             if action == 2:

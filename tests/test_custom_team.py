@@ -62,7 +62,13 @@ def test_custom_without_codex_selects_models_and_same_host_plan(monkeypatch, tmp
     output = capsys.readouterr().out
     assert ("主会话 / AGY" if language == "1" else "Main / AGY") in output
     assert ("工程 / CC" if language == "1" else "Engineer / CC") in output
-    assert ("CC/AGY 收到后续结果" if language == "1" else "CC/AGY will notify") in output
+    assert ("CC 收到后续结果" if language == "1" else "CC will notify") in output
+    if host == "herdr":
+        assert ("AGY 默认通过通知收件；Herdr 中显式交给自动化后" if language == "1"
+                else "AGY receives notices by default; on Herdr, explicit automation ownership") in output
+    else:
+        assert ("Orca 中的 AGY 收到后续结果" if language == "1" else "AGY on Orca will notify") in output
+    assert "--automation-owned" not in selection.arguments
     assert "All current combinations require Codex" not in output
 
 

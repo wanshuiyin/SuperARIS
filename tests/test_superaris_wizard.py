@@ -209,7 +209,7 @@ def test_actual_terminal_three_role_summary_cancel_keeps_new_spaces_path_absent(
     summary(term)
     assert "Claude Code（CC）" in term.text
     assert "工程 / Codex" in term.text
-    assert "写作 / AGY" in term.text
+    assert "研究与写作 / AGY" in term.text
     assert "任务：暂不安排" in term.text
     term.line("3")
     assert term.finish() == 0

@@ -173,7 +173,7 @@ def test_actual_wizard_each_combination_asks_three_models_previews_mapping_and_c
         term.expect("工作台名称")
         preview = term.text.rsplit("[3/4] 分工与工作台", 1)[1]
         compact = {"codex": "Codex", "claude": "CC", "agy": "AGY"}
-        for role, label in (("main", "主会话"), ("engineer", "工程"), ("writer", "写作")):
+        for role, label in (("main", "主会话"), ("engineer", "工程"), ("writer", "研究与写作")):
             assert f"{label} / {compact[TEAMS[preset][role]]}" in preview
         term.line()
         term.expect("本次任务")

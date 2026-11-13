@@ -3,7 +3,7 @@
 Run `superaris` in an interactive terminal; `superaris start` without a project
 opens the same wizard. Noninteractive input/EOF exits or displays usage without
 starting a model. The wizard selects UI language, project, available clients,
-models, layout and optional task before confirmation. The three recommended presets are shortcuts; **Custom team** chooses Codex, Claude Code or Antigravity independently for main, engineer and writer. Any one installed agent client is enough for a custom team; each role has a separate session and model choice. A new empty task waits.
+models, layout and optional task before confirmation. The three recommended presets are shortcuts; **Custom team** chooses Codex, Claude Code or Antigravity independently for main, engineer and writer. Any one installed agent client is enough for a custom team; each role has a separate session and model choice. The visible `writer` role is **Research & Writing**. A new empty task waits.
 UI language changes product text and new readable labels, not paper/task
 language, native client UI or skill bodies. It is saved on confirmed startup
 in the existing project binding; cancellation does not save a new preference.
@@ -14,6 +14,12 @@ Existing projects offer continuation of their original owner, session, models,
 roles and tasks. Existing labels/layout stay intact. Startup continues while
 Herdr is attached after you handle actual native login/trust prompts. It never
 answers them for you or blindly resends an unknown initial task.
+
+The AGY model menu offers Gemini 4 Argon High (`gemini-4-argon-high`), Carbon
+High (`gemini-4-carbon-high`) and Hydrogen High (`gemini-4-hydrogen-high`) for
+any role, including main. Native CLI settings remain the default; manual IDs
+are also available. Back retains the selected model, and existing teams keep
+their recorded requests rather than adopting new menu choices.
 
 ## Explicit commands
 
@@ -38,8 +44,11 @@ children. `--model ROLE=MODEL` requests models only for new sessions. `--name`
 sets a readable new-workbench title. Missing optional clients are unavailable,
 not proof of a fully running team. Role scopes are instructions, not OS sandboxes.
 
-For paper work, a CC owner can organize the goal, Codex can verify facts and
-compile, and an AGY/Gemini role can draft substantively. Writing and fresh review
+For research and paper work, main can delegate methods, hypotheses, derivation
+drafts and experiment suggestions to Research & Writing while engineering runs
+a baseline. Main collects both deliveries, checks the evidence, adjusts the next
+assignment, and brings evidence-backed writing to a fresh MCP reviewer. Any
+configured client/model can hold these responsibilities. Writing and fresh review
 remain different responsibilities. No requirement routes every MCP job into a
 pane. New three-role workbenches place the owner left, engineer upper right and
 writer lower right; adopted owner topology is preserved.

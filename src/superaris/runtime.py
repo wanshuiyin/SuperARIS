@@ -266,7 +266,7 @@ def start(plan: dict, args, *, stop_event=None) -> dict:
             ui_language = current.get("ui_language")
             if ui_language in {"zh", "en"}:
                 from .ui import tr
-                role_title = tr({"main": "主会话", "engineer": "工程", "writer": "写作"}.get(role, role), lang=ui_language)
+                role_title = tr({"main": "主会话", "engineer": "工程", "writer": "研究与写作"}.get(role, role), lang=ui_language)
                 workbench_title = tr("工作台", lang=ui_language)
             else:
                 role_title, workbench_title = role, "Workbench"

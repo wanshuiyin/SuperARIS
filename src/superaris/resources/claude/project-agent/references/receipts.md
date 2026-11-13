@@ -90,8 +90,9 @@ write or paid model call after an uncertain delivery.
 Use the original task record to make the remote execution and local receipt
 explicit. For example, adapt these fields to the already authorized project:
 
-- **Owner:** the existing engineer; main assigns and accepts the work, writer
-  waits for verified results.
+- **Owner:** the existing engineer; main assigns and accepts the work. The
+  research-and-writing role can develop methods in parallel and uses verified
+  results for evidence-dependent writing.
 - **Remote:** SSH alias `research-box`, authorized directory `/srv/research/study`,
   existing environment `/srv/envs/study/bin/python` and the project's known
   small-run command recorded in `notes/WORK.md`. Reuse that entry rather than

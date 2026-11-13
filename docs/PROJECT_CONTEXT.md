@@ -12,7 +12,16 @@ For an already bound role, add context without sending native input:
 ```bash
 superaris context /path/to/project --role main --skill research-pipeline
 superaris context /path/to/project --role engineer --skill analyze-results
+superaris context /path/to/project --role writer --skill research-refine
 ```
+
+The `writer` role is Research & Writing. Main can prepare a research workflow
+or individual skill for method discussion alongside the engineer's baseline.
+The role reads the prepared skill and relevant references, delivers proposals
+through the original task's `watch`/`report` path, and main decides the next
+authorized work. Hypotheses stay distinct from verified findings. Later writing
+uses accepted evidence and a fresh MCP reviewer; decisions and artifacts remain
+in the original project memory.
 
 Repeat `--skill` for additive selections. Preparation uses the binding's original
 task, recovery, source and scope. `--task TEXT` changes this preparation only;

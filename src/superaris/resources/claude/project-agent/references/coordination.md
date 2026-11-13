@@ -33,9 +33,20 @@ worktrees or exclusive directories for concurrent writers. Hand off ownership
 before integrating shared files. Do not send simultaneous MCP and workbench commands
 to the same native session.
 
-For paper/survey writing, Codex can establish source-grounded facts, formulas,
-complexity units, citations and the narrative goal; Gemini can do substantive
-section drafting and revision. Codex checks new claims and integrates the text.
+In a typical research cycle, main can register watch/report handles and run
+stages in parallel across disjoint write scopes: engineer reproduces a baseline
+or runs a pilot check while Research & Writing (`writer`) reads selected ARIS
+skills (such as `research-refine`, `formula-derivation` or `experiment-plan`),
+frames the problem, drafts candidate methods or derivations, and proposes
+discriminating experiments. Untested assumptions and expected outcomes are
+hypotheses. Return both deliveries through the original task's `watch`/`report`
+path. Main reads the actual baseline logs and metrics alongside the proposal,
+updates the original project record, and scopes the next experiment. With
+accepted empirical evidence, writer structures the argument and drafts
+substantial sections from results, formulas and citations (`paper-plan` /
+`paper-write`). A fresh MCP reviewer examines the draft; main checks the
+findings and assigns concrete revisions before integrating shared files.
+
 Choose models from the user's configuration; Claude Code does not imply
 DeepSeek. Add a figure specialist only when the output needs one, with the
 appropriate existing figure skill and an exclusive artifact directory. Writer
@@ -48,8 +59,9 @@ Codex reviewing Codex records `review_independence: same-family` and
 ## Delegate an SSH experiment
 
 For an authorized remote experiment, give the existing engineer one concrete
-work package before starting prolonged setup; keep the writer waiting for
-verified facts. Record the SSH host alias, authorized remote directory, existing
+work package before starting prolonged setup. The research-and-writing role
+can advance independent methods and argument planning in parallel; use verified
+facts for result claims. Record the SSH host alias, authorized remote directory, existing
 user-confirmed environment and run command, first small real experiment,
 local deliverable paths, original sync/status entry and budget/stop condition in
 the original task. Reuse the environment and working entry; apply the original

@@ -70,7 +70,10 @@ packet/navigation host instructions before workbench operations.
 Every recommended preset starts `main`, `engineer` and `writer`: `codex` maps all
 three to Codex; `cc-codex` uses CC / Codex / CC; `cc-codex-agy` uses
 CC / Codex / AGY. Role, harness and model are separate; CC does not imply a
-particular provider. Collaborators read their own context and wait for main.
+particular provider. The visible `writer` role is Research & Writing: methods,
+argument and substantive prose. Collaborators read their own context and wait
+for an assignment from main. Once assigned, independent research can run
+alongside engineering.
 The presets are shortcuts, not restrictions: Custom team independently selects Codex,
 CC or AGY for each role and keeps separate sessions/models. At least one installed
 agent client is enough, without requiring Codex. For example:
@@ -92,7 +95,11 @@ superaris start /path/to/project --session research-demo --preset cc-codex --onl
 
 Use `--skill NAME` repeatedly for pipeline/workflow/individual selections,
 `--model ROLE=MODEL` for new-role requests and `--name TEXT` for new readable
-workbench titles. Actual model identity comes from native results. Scopes are
+workbench titles. The AGY wizard offers Argon High, Carbon High and Hydrogen High shortcuts
+(`gemini-4-argon-high`, `gemini-4-carbon-high`, `gemini-4-hydrogen-high`)
+for any AGY role, alongside native settings and a manually entered ID. Native
+settings remain the default; returning to a selection retains its chosen model.
+Actual model identity comes from native results. Scopes are
 ownership instructions, not an OS sandbox. Adopted owners retain their topology;
 new-only layouts are described in [layouts.md](layouts.md).
 

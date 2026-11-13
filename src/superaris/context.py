@@ -200,9 +200,20 @@ def _navigation(project, role, harness, task, scopes, repo, run, skill_index, or
         encoding="utf-8",
     )
     responsibility = {
-        "main": "Organize the project goal and authorized next steps, assign ownership, collect real artifacts and apply the original acceptance gates.",
+        "main": (
+            "Own the project goal, authorization and acceptance gates, executing directly within scope "
+            "or delegating engineering and independent research/writing work in parallel. Inspect returned "
+            "proposals and empirical artifacts to decide the next authorized assignments, and ground result "
+            "claims in verified evidence."
+        ),
         "engineer": "Implement and run authorized experiments or checks; produce artifacts, reproducible evidence and factual handoffs for the owner.",
-        "writer": "Write substantial prose and organize explanations within the owner's established facts, formulas and citation boundaries; hand technical claims back for acceptance.",
+        "writer": (
+            "Research & Writing: define the problem, develop candidate methods, hypotheses and derivation drafts, "
+            "and propose discriminating experiments before or while engineering runs; structure the argument "
+            "and write substantial prose. Present untested assumptions and expected outcomes as hypotheses, "
+            "ground empirical statements in verified results and citations, and deliver ideas and technical "
+            "claims to the original main owner for acceptance and next assignments."
+        ),
         "figures": "Prepare requested figures using the original evidence and visual contracts; preserve editable sources and verify the exported artifact.",
     }.get(role, "Use the task and original owner handoff to determine your role; request clarification if the responsibility is not specified.")
     role_file = run / "role.md"

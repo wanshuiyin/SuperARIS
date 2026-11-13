@@ -34,6 +34,7 @@ For Orca, install and open the [official app](https://www.onorca.dev/) first; if
 
 ## News
 
+- **2026-11-13** — Fixed partial team recovery: selecting members with `--only-role` now preserves recorded custom roles, clients and requested models, including interrupted startups ([#4](https://github.com/wanshuiyin/SuperARIS/pull/4)).
 - **2026-11-11** — Improved SSH experiment guidance: explicit handoffs, milestone-based verification and bounded troubleshooting. The default ARIS revision now includes source/config sync and working-environment reuse fixes ([#3](https://github.com/wanshuiyin/SuperARIS/pull/3), [ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)).
 - **2026-11-09** — Choose each role's client and model with Custom team, including AGY-led teams without Codex ([#2](https://github.com/wanshuiyin/SuperARIS/pull/2)).
 - **2026-11-09** — Inspect local usage by role and client with `superaris usage` ([#1](https://github.com/wanshuiyin/SuperARIS/pull/1), [guide](docs/USAGE.md)).

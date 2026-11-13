@@ -52,7 +52,9 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 主 Agent 把握研究方向、组织分工并回收成果。Codex 可以实现实验与核查证据，Gemini 可以共同讨论立意、组织论证并主写论文正文。主 Agent 也可以在授权范围内直接执行任务或编码。每个成员都有自己的常驻会话，你可以直接与它共创，让讨论接着已有上下文继续。
 
-新团队统一有主 Agent、工程与写作三个角色：推荐预设有全部 Codex、Claude Code 主控/写作配 Codex 工程，或 Claude Code / Codex / Antigravity。也可以在向导选择**自定义团队**，让三个角色各选 Codex、Claude Code 或 Antigravity，包括 AGY 主控以及没有 Codex 的组合。每个角色有独立的模型选择与会话；临时 MCP worker 和需要全新上下文的独立 reviewer 继续在后台协作。
+新团队统一有主 Agent、工程与**研究与写作**（内部 `writer`）三个角色：推荐预设有全部 Codex、Claude Code 主控/研究写作配 Codex 工程，或 Claude Code / Codex / Antigravity。也可以在向导选择**自定义团队**，让三个角色各选 Codex、Claude Code 或 Antigravity，包括 AGY 主控以及没有 Codex 的组合。每个角色有独立的模型选择与会话；任意 AGY 角色均可在向导选择 Gemini 4 Argon High、Carbon High、Hydrogen High 或手填型号，默认仍沿用原生 CLI 设置。临时 MCP worker 和需要全新上下文的独立 reviewer 继续在后台协作。
+
+研究与写作角色可以定义问题、提出候选方法与推导草案、建议能区分假设的实验，并主写论文。例如主控并行派发方法讨论和基线实验，核验返回证据后调整后续派工，再组织基于结果的写作与 fresh MCP 审阅。待验证的想法、决定和交付沿原项目记录保存；这份职责可由任意已配置客户端或模型承担。
 
 ## 每个成员都能使用 ARIS
 
@@ -99,13 +101,13 @@ superaris
 
 选择界面语言、项目、团队和模型，确认后进入工作台。可以直接给主 Agent 一个任务，也可以先打开团队，再讨论要做什么。界面语言与论文、任务语言分别选择。
 
-| 推荐预设 | 主 Agent | 工程 | 写作 |
+| 推荐预设 | 主 Agent | 工程 | 研究与写作 |
 |---|---|---|---|
 | Codex | Codex | Codex | Codex |
 | Claude Code + Codex | Claude Code | Codex | Claude Code |
 | Claude Code + Codex + Antigravity | Claude Code | Codex | Antigravity |
 
-预设只是快捷选项，不限制角色客户端。例如在**自定义团队**中选择 AGY 主控、CC 工程、AGY 写作，也可运行：
+预设只是快捷选项，不限制角色客户端。例如在**自定义团队**中选择 AGY 主控、CC 工程、AGY 研究与写作，也可运行：
 
 ```bash
 superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy

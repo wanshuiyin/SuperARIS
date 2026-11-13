@@ -112,8 +112,8 @@ def test_confirmed_new_labels_follow_ui_language_without_changing_task_language(
     assert bound["ui_language"] == language
     assert set(bound["roles"]) == {"main", "engineer", "writer"}
     commands = json.loads(fixture["state"].read_text())["commands"]
-    titles = {"main": "Main", "engineer": "Engineer", "writer": "Writer"} if language == "en" else {
-        "main": "主会话", "engineer": "工程", "writer": "写作"}
+    titles = {"main": "Main", "engineer": "Engineer", "writer": "Research & Writing"} if language == "en" else {
+        "main": "主会话", "engineer": "工程", "writer": "研究与写作"}
     for role, title in titles.items():
         matching = [args for args in commands if args[:3] == ["pane", "rename", bound["roles"][role]["pane_id"]]]
         assert len(matching) == 1

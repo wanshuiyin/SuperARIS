@@ -47,8 +47,9 @@ PASS. Keep the handle active while still waiting. Unknown delivery uses
 Assign remote experiment work to the existing engineer with its SSH host,
 authorized remote directory, user-confirmed environment/working command, first
 small real experiment, local result/log paths and original sync/status entry in
-the task record. Main actually dispatches and checks that first result; writer
-waits for accepted facts. Main can still execute or code within its authority.
+the task record. Main actually dispatches and checks that first result.
+Research & Writing can develop independent methods and arguments in parallel;
+result claims use accepted facts. Main can still execute or code within its authority.
 Reuse the existing environment and entry, applying the original experiment
 skill's checks to actual changes.
 

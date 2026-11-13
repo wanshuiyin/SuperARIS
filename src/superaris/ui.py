@@ -10,8 +10,8 @@ _EN = {
     "：": ": ",
     "主会话：统筹、恢复与验收": "Main: coordination, recovery and acceptance",
     "工程：实现与事实核查": "Engineering: implementation and fact checking",
-    "写作：正文与解释": "Writing: prose and explanation",
-    "主会话": "Main", "工程": "Engineer", "写作": "Writer", "工作台": "Workbench",
+    "研究与写作：方法、论证与正文": "Research & Writing: methods, argument and prose",
+    "主会话": "Main", "工程": "Engineer", "研究与写作": "Research & Writing", "工作台": "Workbench",
     "ARIS 工作包已准备": "ARIS work packet ready",
     "已取消启动，未创建工作台。": "Startup cancelled; no workbench was created.",
     "无法创建项目目录：{error}": "Cannot create project directory: {error}",
@@ -108,6 +108,9 @@ def tr(key: str, *, lang: str | None = None, **values) -> str:
     return text.format(**values) if values else text
 
 
+ROLE_LABELS = {"main": "主会话：统筹、恢复与验收", "engineer": "工程：实现与事实核查",
+               "writer": "研究与写作：方法、论证与正文"}
+
+
 def role_label(role: str, *, lang: str | None = None) -> str:
-    label = {"main": "主会话：统筹、恢复与验收", "engineer": "工程：实现与事实核查", "writer": "写作：正文与解释"}.get(role, role)
-    return tr(label, lang=lang)
+    return tr(ROLE_LABELS.get(role, role), lang=lang)

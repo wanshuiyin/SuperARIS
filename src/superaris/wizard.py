@@ -29,7 +29,7 @@ class Selection:
 
 
 LABELS = {"codex": "Codex", "claude": "Claude Code（CC）", "agy": "Antigravity（AGY）"}
-ROLES = {"main": "主会话：统筹、恢复与验收", "engineer": "工程：实现与事实核查", "writer": "写作：正文与解释"}
+ROLES = ui.ROLE_LABELS
 COMBINATIONS = [
     ("仅 Codex（三角色）", "codex", [("main", "codex"), ("engineer", "codex"), ("writer", "codex")]),
     ("CC + Codex（三角色）", "cc-codex", [("main", "claude"), ("engineer", "codex"), ("writer", "claude")]),
@@ -144,18 +144,21 @@ def dependency_summary(available: dict, host: str = "herdr") -> bool:
 
 def select_model(role: str, kind: str, previous: str | None) -> str | None:
     print(tr("\n{role} / {client} — 模型", role=ui.role_label(role), client=tr(LABELS[kind])))
-    examples = {"codex": "gpt-6.1-sol", "agy": "gemini-4-argon-high"}
-    example = examples.get(kind)
+    shortcuts = {
+        "codex": [("GPT-6.1 Sol", "gpt-6.1-sol")],
+        "agy": [("Gemini 4 Argon High", "gemini-4-argon-high"),
+                ("Gemini 4 Carbon High", "gemini-4-carbon-high"),
+                ("Gemini 4 Hydrogen High", "gemini-4-hydrogen-high")],
+    }.get(kind, [])
     options = [tr("沿用已有设置"), tr("手动输入模型 ID")]
-    if example:
-        title = "GPT-6.1 Sol" if kind == "codex" else "Gemini 4 Argon High"
-        options.append(tr("{title}（可选型号）", title=title))
-    default = 3 if previous and previous == example else 2 if previous else 1
+    options.extend(tr("{title}（可选型号）", title=title) for title, _ in shortcuts)
+    default = next((index + 3 for index, (_, model) in enumerate(shortcuts) if model == previous),
+                   2 if previous else 1)
     choice = choose(tr("模型选择"), options, default)
     if choice == 1:
         return None
-    if choice == 3:
-        return example
+    if choice >= 3:
+        return shortcuts[choice - 3][1]
     while True:
         model = ask(tr("模型 ID"), previous or "")
         if model:
@@ -193,17 +196,17 @@ def layout(roles: list[tuple[str, str]]) -> None:
     clients = {role: {"claude": "CC", "codex": "Codex", "agy": "AGY"}[kind] for role, kind in roles}
     main = tr("主会话") + " / " + clients.get("main", "")
     engineer = tr("工程") + " / " + clients.get("engineer", "")
-    writer = tr("写作") + " / " + clients.get("writer", "")
+    writer = tr("研究与写作") + " / " + clients.get("writer", "")
     if len(roles) == 3:
-        print("┌────────────────────┬──────────────────────┐")
-        print(f"│ {_preview_pad(main, 19)}│ {_preview_pad(engineer, 21)}│")
-        print("│                    ├──────────────────────┤")
-        print(f"│                    │ {_preview_pad(writer, 21)}│")
-        print("└────────────────────┴──────────────────────┘")
+        print("┌────────────────────┬────────────────────────────┐")
+        print(f"│ {_preview_pad(main, 19)}│ {_preview_pad(engineer, 27)}│")
+        print("│                    ├────────────────────────────┤")
+        print(f"│                    │ {_preview_pad(writer, 27)}│")
+        print("└────────────────────┴────────────────────────────┘")
     elif len(roles) == 2:
-        print("┌────────────────────┬──────────────────────┐")
-        print(f"│ {_preview_pad(main, 19)}│ {_preview_pad(engineer, 21)}│")
-        print("└────────────────────┴──────────────────────┘")
+        print("┌────────────────────┬────────────────────────────┐")
+        print(f"│ {_preview_pad(main, 19)}│ {_preview_pad(engineer, 27)}│")
+        print("└────────────────────┴────────────────────────────┘")
     else:
         print("┌───────────────────────────────────────────┐")
         print(f"│ {_preview_pad(main, 42)}│")

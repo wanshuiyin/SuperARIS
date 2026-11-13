@@ -50,7 +50,9 @@ Built on [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep
 
 Your main agent holds the research direction and coordinates the work. Codex can implement experiments and check evidence; Gemini can discuss the argument and write substantial paper sections. The main role can also execute or code directly within its authorized scope. Each collaborator has its own ongoing session, so you can work directly with the teammate you need and continue the discussion where you left off.
 
-Every new team has three roles: main, engineer and writer. Recommended presets offer an all-Codex team, Claude Code main/writer with Codex engineering, or Claude Code / Codex / Antigravity. Choose **Custom team** in the wizard to assign Codex, Claude Code or Antigravity to each role independently, including an AGY main and teams without Codex. Each role keeps its own model choice and session. Temporary MCP workers and fresh reviewers remain available alongside the persistent team.
+Every new team has three roles: main, engineer and **Research & Writing** (`writer`). Recommended presets offer an all-Codex team, Claude Code main/writer with Codex engineering, or Claude Code / Codex / Antigravity. Choose **Custom team** in the wizard to assign Codex, Claude Code or Antigravity to each role independently, including an AGY main and teams without Codex. Each role keeps its own model choice and session. For any AGY role, the wizard offers Gemini 4 Argon High, Carbon High and Hydrogen High alongside manual IDs; keeping the native CLI settings remains the default. Temporary MCP workers and fresh reviewers remain available alongside the persistent team.
+
+The research-and-writing role can define problems, develop candidate methods and derivations, suggest experiments that distinguish hypotheses, and write the paper. For example, main delegates method discussion alongside a baseline experiment, checks the returned evidence, adjusts the next assignment, then collects evidence-backed writing for a fresh MCP review. Proposals and decisions stay in the existing project record. This responsibility works with any configured client or model.
 
 ## ARIS for every teammate
 
@@ -97,7 +99,7 @@ superaris
 
 Choose the interface language, project, team, and models, then confirm the workspace. Give the main agent a task, or open the team and discuss what to do next. The interface language is independent of your paper or task language.
 
-| Recommended preset | Main | Engineer | Writer |
+| Recommended preset | Main | Engineer | Research & Writing |
 |---|---|---|---|
 | Codex | Codex | Codex | Codex |
 | Claude Code + Codex | Claude Code | Codex | Claude Code |

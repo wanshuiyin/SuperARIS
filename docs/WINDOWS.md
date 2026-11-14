@@ -52,6 +52,15 @@ Windows instructions, then complete its own login and model configuration.
 SuperARIS does not approve login/trust prompts or rewrite model/MCP settings.
 Finding the executable confirms only that it is available on PATH.
 
+## Update from PowerShell
+
+Use `superaris update --check`, then `superaris update`. The Windows launcher
+hands off to an external worker so its executable can be replaced; its initial
+success code acknowledges that handoff. Read the printed result/log paths for
+the actual installed commit or failure, then run `--check` again. Existing
+pipx copied launchers are supported; Developer Mode or symlink permission is
+not required. See [updates, one-time bootstrap and per-project receiver refresh](DEPENDENCIES.md#updates).
+
 ## Paths, source selection and recovery
 
 Use quoted Windows paths, including paths with spaces or Chinese characters:

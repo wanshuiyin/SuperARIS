@@ -105,6 +105,8 @@ def parser(prog: str = "superaris") -> argparse.ArgumentParser:
     p = _ArgumentParser(prog=prog, description="SuperARIS project workbench: native owners, ARIS skills and existing MCP collaboration.",
                                 epilog="交互启动 / Interactive: superaris (or superaris start). 脚本用法 / Scripts: superaris start PROJECT [options].")
     sub = p.add_subparsers(dest="command", required=True)
+    update = sub.add_parser("update", help="update this installation from official SuperARIS main")
+    update.add_argument("--check", action="store_true", help="check installed/latest Git revision without installing")
     s = sub.add_parser("start", help="start or reconnect the selected project owners")
     p.start_parser = s
     s.add_argument("project", type=Path, nargs="?")
@@ -258,6 +260,9 @@ def main(argv: list[str] | None = None, *, prog: str = "superaris") -> int:
         if args.command == "start" and args.project is None:
             command_parser.error("start requires PROJECT; run bare superaris in an interactive terminal for the wizard")
     try:
+        if args.command == "update":
+            from .updater import update
+            return update(args.check)
         if args.command != "start":
             project = args.project.expanduser().resolve()
             if not project.is_dir():

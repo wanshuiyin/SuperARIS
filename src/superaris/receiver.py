@@ -18,10 +18,17 @@ from .state import directory, read, write
 from . import __version__
 from .platform import FileLock, LockBusy, detached_process_options
 from .hosts import client_for_binding, identity_present, selected_host
+from .updater import installed_revision
+
+
+_REVISION = installed_revision()
 
 
 def implementation() -> dict:
-    return {"package": "superaris", "version": __version__, "path": str(Path(__file__).resolve().parent)}
+    result = {"package": "superaris", "version": __version__, "path": str(Path(__file__).resolve().parent)}
+    if _REVISION:
+        result["revision"] = _REVISION
+    return result
 
 
 def signature(bound: dict) -> dict:
@@ -138,6 +145,8 @@ class ProjectLifetime:
             self.reason = "receiver_replaced"
         elif not same_owner(self.expected_owner, signature(binding(self.project))):
             self.reason = "original_owner_changed"
+        elif installed_revision() != _REVISION:
+            self.reason = "installation_changed"
         return self.reason is not None
 
     def wait(self, seconds: float) -> bool:

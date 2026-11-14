@@ -23,6 +23,9 @@ superaris
 
 Choose your language, project, workbench, team and models. Existing Herdr or Orca installations are reused.
 
+Already installed? Run `superaris update --check`, then `superaris update`.
+[Older-version bootstrap and receiver refresh →](docs/DEPENDENCIES.md#updates)
+
 For an explicit start, open a new project's directory and choose one workbench:
 
 | Workbench | Start in the current project | Setup guide |
@@ -34,6 +37,7 @@ For Orca, install and open the [official app](https://www.onorca.dev/) first; if
 
 ## News
 
+- **2026-11-14** — Update from the terminal with `superaris update --check` and `superaris update`: verify the actual Git commit, including same-version changes, while preserving project records and agent sessions. Refresh receiving through the original project commands ([#7](https://github.com/wanshuiyin/SuperARIS/pull/7), [guide](docs/DEPENDENCIES.md#updates)).
 - **2026-11-13** — **Bring Gemini into research from the start:** the expanded Research & Writing role spans ideas, methods and substantive paper writing, with new Carbon/Hydrogen model choices. Explicitly automation-owned AGY sessions on Herdr can pick up reports and continue in the same conversation. ARIS workflows, skills and MCP collaboration remain available ([#5](https://github.com/wanshuiyin/SuperARIS/pull/5), [#6](https://github.com/wanshuiyin/SuperARIS/pull/6)).
 - **2026-11-13** — Fixed partial team recovery: selecting members with `--only-role` now preserves recorded custom roles, clients and requested models, including interrupted startups ([#4](https://github.com/wanshuiyin/SuperARIS/pull/4)).
 - **2026-11-11** — Improved SSH experiment guidance: explicit handoffs, milestone-based verification and bounded troubleshooting. The default ARIS revision now includes source/config sync and working-environment reuse fixes ([#3](https://github.com/wanshuiyin/SuperARIS/pull/3), [ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)).

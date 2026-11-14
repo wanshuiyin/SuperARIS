@@ -120,6 +120,8 @@ def test_same_version_update_check_and_original_receiver_refresh(tmp_path, monke
     assert all(path.read_bytes() == content for path, content in original.items())
     report = installed.update()
     assert report["target"] == installed.new
+    confirmed = installed.run([installed.entry, "update", "--check"], "check-current")
+    assert installed.new in confirmed.stdout and "Already current" in confirmed.stdout
     stopped = receiver_cases.wait_until(lambda: receiver_cases.receiver.status(fixture.project)
                                        if not receiver_cases.receiver.status(fixture.project)["managed_process_alive"] else None)
     assert stopped["outcome"]["reason"] == "installation_changed"
@@ -136,4 +138,5 @@ def test_same_version_update_check_and_original_receiver_refresh(tmp_path, monke
     (installed.root / "RESULT.json").write_text(json.dumps({"manager": manager, "old": installed.old,
         "new": installed.new, "version": "0.1.0", "check_read_only": True,
         "original_binding_notes_preserved": True, "old_receiver": before, "stopped": stopped,
-        "refreshed": refreshed, "handoff": report, "native_or_model_calls": 0}, indent=2) + "\n", encoding="utf-8")
+        "refreshed": refreshed, "final_receiver": receiver_cases.receiver.status(fixture.project),
+        "handoff": report, "native_or_model_calls": 0}, indent=2) + "\n", encoding="utf-8")

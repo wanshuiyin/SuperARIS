@@ -53,7 +53,11 @@ def test_worker_reports_failure_for_manager_error_or_unverified_revision(tmp_pat
            "target": "f" * 40, "wait_for_exit": False,
            "command": [sys.executable, "-c", f"raise SystemExit({return_code})"], "environment": {}}
     path = tmp_path / "job.json"; path.write_text(json.dumps(job))
-    assert updater._worker(path) == 1
+    worker = tmp_path / "update_worker.py"
+    worker.write_bytes(Path(updater.__file__).read_bytes())
+    response = subprocess.run([sys.executable, str(worker), "--worker", str(path)],
+                              capture_output=True, text=True, encoding="utf-8", timeout=20)
+    assert response.returncode == 1 and "Updated:" not in response.stdout
     result = json.loads((tmp_path / "result.json").read_text())
     assert result["status"] == "failed" and result["exit_code"] == 1
     assert ("Package manager exited 23" if return_code else "did not match") in result["error"]

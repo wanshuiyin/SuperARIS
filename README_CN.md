@@ -25,6 +25,9 @@ superaris
 
 依次选择语言、项目、工作台、团队和模型；已安装的 Herdr 或 Orca 会直接复用。
 
+已安装后，用 `superaris update --check` 检查、`superaris update` 更新。
+[旧版首次引导与原项目 receiver 刷新 →](docs/DEPENDENCIES.md#updates)
+
 也可以进入新项目目录，明确选择一种工作台启动：
 
 | 工作台 | 在当前项目启动 | 安装与使用指南 |
@@ -36,6 +39,7 @@ superaris
 
 ## 近期更新
 
+- **2026-11-14** — 新增终端自更新：用 `superaris update --check` 检查、`superaris update` 升级，按真实 Git commit 核验同版本新提交，保留项目记录与 Agent 会话；收件按原项目命令刷新（[#7](https://github.com/wanshuiyin/SuperARIS/pull/7)、[指南](docs/DEPENDENCIES.md#updates)）。
 - **2026-11-13** — **释放 Gemini 的研究潜力**：将写作角色拓展为“研究与写作”，让 Gemini 从研究构思、方法讨论到论文主写全程参与，并新增 Carbon／Hydrogen 模型选项。Herdr 中显式启用自动化的 AGY 常驻会话可收到报告后自动接续；原有 ARIS workflow、skills 与 MCP 协作保持可用（[#5](https://github.com/wanshuiyin/SuperARIS/pull/5)、[#6](https://github.com/wanshuiyin/SuperARIS/pull/6)）。
 - **2026-11-13** — 修复部分团队恢复：使用 `--only-role` 选择成员时，保留已记录的自定义角色、客户端与模型，包括中断后的启动恢复（[#4](https://github.com/wanshuiyin/SuperARIS/pull/4)）。
 - **2026-11-11** — 完善 SSH 实验派工、里程碑验收和排障收口；默认 ARIS 版本已纳入代码／配置同步与已有环境复用修复（[#3](https://github.com/wanshuiyin/SuperARIS/pull/3)、[ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)）。

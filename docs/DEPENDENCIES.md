@@ -63,6 +63,70 @@ Do not derive a SuperARIS executable from `$ARIS_REPO/tools/`.
 
 ## Updates
 
+### Update the installed application
+
+Run these in an ordinary terminal, including a Herdr or Orca shell pane:
+
+```bash
+superaris update --check
+superaris update
+```
+
+`--check` reads the actual installation and official Git main without installing
+or changing project files. The update installs that exact commit with the
+original environment's pip or pipx and verifies the installed commit afterward.
+A new Git commit counts as an update even when both versions are still `0.1.0`.
+Already-current installations are left alone. Source/editable/global Python
+installs and unsupported pipx layouts are reported without resetting a checkout
+or choosing another environment. Pipx needs `install --upgrade` support; update
+pipx through its original installer if that command is unavailable.
+
+Windows console launchers cannot replace themselves while running. The command
+hands off to an external worker, prints its result/log paths, and exits. This
+initial message means **handed off**, not completed. The result JSON records
+`updated` with the actual installed revision, or `failed` with the error; the log
+contains the package-manager output. After completion, `superaris update --check`
+confirms the revision. On macOS/Linux, the terminal command waits and returns the
+actual update result.
+
+### One-time bootstrap for older installations
+
+Older releases have no `update` command. Stop receiving for each running project
+first (commands below), then use the original installer once:
+
+```bash
+# Existing pipx installation:
+pipx install --force --pip-args=--force-reinstall "git+https://github.com/wanshuiyin/SuperARIS.git@main"
+
+# Existing ordinary venv: activate that original environment first.
+python -m pip install --upgrade --force-reinstall "git+https://github.com/wanshuiyin/SuperARIS.git@main"
+```
+
+Then use `superaris update` for subsequent updates. The bootstrap uses a forced
+Git reinstall so an unchanged version number cannot skip new code.
+
+### Refresh receiving for running projects
+
+Installing code preserves native agents, original owners, project notes and
+pending/unknown receipts. It does not hot-reload agent context. Update-aware
+receivers retain their started revision and stop when the installation changes;
+older receivers must be stopped explicitly. Neither is automatically restarted.
+For each running project, use its original path:
+
+```bash
+superaris receiver "/path/to/project" --action stop
+superaris receiver "/path/to/project" --action status
+# Once stopped, after the update succeeds:
+superaris receiver "/path/to/project" --action start
+```
+
+The existing owner is verified and the original receipt history is reused;
+starting another receiver while the original lock is held is refused. Updating
+SuperARIS does not update Herdr/Orca, agent CLIs, model/auth/MCP configuration or
+a user-selected ARIS checkout.
+
+### ARIS source updates
+
 The preview's default ARIS pin does not track mutable upstream main. A later
 SuperARIS version can update that pin. To choose another source now, explicitly
 provide a valid checkout and preserve the project's existing owner, contracts,

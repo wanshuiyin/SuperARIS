@@ -17,6 +17,12 @@ class HerdrError(RuntimeError):
     pass
 
 
+class OwnerVerificationError(HerdrError):
+    def __init__(self, message: str, owner_state: str):
+        super().__init__(message)
+        self.owner_state = owner_state
+
+
 class Herdr:
     def __init__(self, session: str, binary: str = "herdr"):
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", session):
@@ -165,15 +171,27 @@ def verify_owner(client: Herdr, role: dict, project: Path) -> dict:
         return client.verify_owner(role, project)
     agent = client.json("agent", "get", role["pane_id"])["agent"]
     if agent.get("pane_id") != role["pane_id"] or agent.get("agent") != role["harness"]:
-        raise HerdrError("Recorded pane occupant changed; explicit owner handoff is required")
-    live = foreground(client.json("pane", "process-info", "--pane", role["pane_id"])["process_info"], role["harness"])
+        raise OwnerVerificationError("Recorded pane occupant changed; explicit owner handoff is required", "changed")
+    info = client.json("pane", "process-info", "--pane", role["pane_id"])["process_info"]
+    try:
+        live = foreground(info, role["harness"])
+    except HerdrError as exc:
+        processes = info.get("foreground_processes", [])
+        # Only actual process evidence identifies a shell. An unrecognized or
+        # missing process/API failure is not proof that the owner exited.
+        shells = {"powershell", "pwsh", "cmd", "sh", "bash", "zsh", "fish"}
+        if agent.get("agent_status") in {"idle", "done"} and processes and all(
+                item.get("pid") and item.get("cwd") and item.get("argv") and
+                Path(item["argv"][0]).name.lower().removesuffix(".exe") in shells for item in processes):
+            raise OwnerVerificationError("The recorded main/client is no longer in the foreground; the pane is a shell", "shell") from exc
+        raise
     if Path(live["cwd"]) != project:
         raise HerdrError(f"Owner effective cwd mismatch: {live['cwd']} != {project}")
     native = (agent.get("agent_session") or {}).get("value")
     if role.get("native_session_id") and native and role["native_session_id"] != native:
-        raise HerdrError("Native session changed; inspect ownership before rebinding")
+        raise OwnerVerificationError("Native session changed; inspect ownership before rebinding", "changed")
     if role.get("pid") and role["pid"] != live["pid"]:
-        raise HerdrError("Foreground process changed; inspect ownership before rebinding")
+        raise OwnerVerificationError("Foreground process changed; inspect ownership before rebinding", "changed")
     return {**role, **live, "native_session_id": native or role.get("native_session_id"),
             "status": agent.get("agent_status", "unknown"), "name": agent.get("name", role.get("name"))}
 

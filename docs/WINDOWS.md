@@ -85,6 +85,46 @@ the original owner and server remaining alive; rebooting or stopping that server
 is different from detaching. Do not run a legacy receiver and the installed
 product's receiver against the same active project.
 
+## Main pane returns to PowerShell / 主控退回终端
+
+A pane title such as **Main · Claude Code** names its role; it is not a liveness
+indicator. If `hi` or `/` is handled by PowerShell, the pane is currently a shell.
+That alone does not establish why the native client stopped or failed to start.
+SuperARIS pauses receiving when it cannot verify the original main. It records
+the failure and attempts one workbench notification; if the host itself is
+unreachable, the diagnostic remains available on disk. Busy clients and native
+login/trust waits with the original process are not treated as exits.
+
+主控标题只是角色名。如果 `hi` 或 `/` 被 PowerShell 当作命令执行，当前界面就是
+Shell，需先查看此前客户端错误。收件器会保留原团队和任务、记录失败并尝试一次通知；
+连接或权限异常只提示无法核实，不据此认定客户端已退出。
+
+From a separate PowerShell terminal, inspect the existing diagnostic:
+
+```powershell
+superaris receiver "D:\research-project" --action status
+Get-Content -LiteralPath "D:\research-project\.aris\workbench\receiver.json"
+```
+
+If startup did not complete, also inspect `.aris/workbench/startup-error.json`
+when present. Resolve the actual client/connection error first. If the original
+main process is still alive and can be verified again, explicitly resume receiving:
+
+```powershell
+superaris receiver "D:\research-project" --action start
+```
+
+A newly launched client has a new process identity: ordinary `superaris` reentry
+rejects it, and `--owner` does not replace an already recorded main. There is
+currently no in-place main-replacement command. Preserve the records and resolve
+an explicit ownership handoff rather than deleting `.aris` or replaying unknown
+tasks. No command is automatically typed into the shell.
+
+请从另一个 PowerShell 查看上述状态和错误文件。只有原主控进程仍活着且重新通过核实后，
+才用 `receiver --action start` 恢复收件。重新启动客户端会改变进程身份，不能靠裸
+`superaris` 或 `--owner` 覆盖原绑定；当前没有原地替换主控命令。请保留记录，明确交接
+负责人，不删除 `.aris`、不重发未知任务，也不向 Shell 输入科研任务。
+
 ## Support and verification scope
 
 The product's platform boundary uses Windows kernel file locks, raw

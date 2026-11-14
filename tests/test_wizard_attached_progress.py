@@ -204,7 +204,7 @@ def test_three_roles_and_receiver_finish_before_user_detaches(attached):
     assert receiver.status(fixture.project)["managed_process_alive"] is True
 
 
-@pytest.mark.parametrize("failure", ["owner-replaced", "later-start-error"])
+@pytest.mark.parametrize("failure", ["owner-replaced", "main-shell", "later-start-error"])
 def test_attached_startup_failure_keeps_pending_choices_without_duplicate_tasks(attached, failure):
     fixture = attached
     fixture.choose_team()
@@ -215,13 +215,28 @@ def test_attached_startup_failure_keeps_pending_choices_without_duplicate_tasks(
         main["agent_status"] = "idle"
         if failure == "owner-replaced":
             main["pid"] += 100
+        elif failure == "main-shell":
+            main["argv"] = ["powershell.exe"]
         else:
             state["fail_kind"] = "codex"
 
     fixture.update(change)
     error_path = fixture.project / ".aris/workbench/startup-error.json"
-    expected_error = "process changed" if failure == "owner-replaced" else "fake later native startup failed"
+    expected_error = {"owner-replaced": "process changed", "main-shell": "pane is a shell",
+                      "later-start-error": "fake later native startup failed"}[failure]
     wait_until(lambda: error_path.exists() and expected_error in json.loads(error_path.read_text())["error"].lower())
+    def failure_notices():
+        return [args for args in fixture.ledger() if args[:2] == ["notification", "show"]
+                and args[2] == "SuperARIS 启动未完成"]
+    wait_until(failure_notices)
+    notices = failure_notices()
+    assert len(notices) == 1
+    # Either direct owner verification or an already-starting receiver can
+    # observe the replacement first. The notice shows the actual short error;
+    # the full diagnostic above still contains the original failure evidence.
+    saved_error = json.loads(error_path.read_text())["error"]
+    assert saved_error[:240].lower() in notices[0][notices[0].index("--body") + 1].lower()
+    assert str(error_path) in notices[0][notices[0].index("--body") + 1]
     assert not fixture.release.exists()
     fixture.release.touch()
     assert fixture.term.finish() != 0, fixture.term.text
@@ -230,10 +245,11 @@ def test_attached_startup_failure_keeps_pending_choices_without_duplicate_tasks(
     assert failed["roles"]["main"]["pid"] == original["pid"]
     assert "writer" not in failed["roles"]
     starts = [args for args in fixture.ledger() if args[:2] == ["agent", "start"]]
-    expected = ["claude"] if failure == "owner-replaced" else ["claude", "codex"]
+    expected = ["claude", "codex"] if failure == "later-start-error" else ["claude"]
     assert [args[args.index("--kind") + 1] for args in starts] == expected
     assert json.loads(fixture.state.read_text()).get("submissions", []) == []
     assert fixture.ledger().count([]) == 1
+    assert len(failure_notices()) == 1
     current_receiver = receiver.status(fixture.project)
     if current_receiver["managed_process_alive"]:
         assert current_receiver["owner"]["pid"] == original["pid"]

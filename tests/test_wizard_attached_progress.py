@@ -231,7 +231,11 @@ def test_attached_startup_failure_keeps_pending_choices_without_duplicate_tasks(
     wait_until(failure_notices)
     notices = failure_notices()
     assert len(notices) == 1
-    assert expected_error in notices[0][notices[0].index("--body") + 1].lower()
+    # Either direct owner verification or an already-starting receiver can
+    # observe the replacement first. The notice shows the actual short error;
+    # the full diagnostic above still contains the original failure evidence.
+    saved_error = json.loads(error_path.read_text())["error"]
+    assert saved_error[:240].lower() in notices[0][notices[0].index("--body") + 1].lower()
     assert str(error_path) in notices[0][notices[0].index("--body") + 1]
     assert not fixture.release.exists()
     fixture.release.touch()

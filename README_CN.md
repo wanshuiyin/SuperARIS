@@ -197,12 +197,19 @@ superaris
 - [技能、上下文与恢复](docs/PROJECT_CONTEXT.md)
 - [主动跟进与项目记忆](docs/RESULTS_AND_MEMORY.md)
 - [ARIS 来源、依赖与更新](docs/DEPENDENCIES.md)
+- [参与贡献与本地开发](CONTRIBUTING_CN.md)
+
+<a id="参与贡献"></a>
+
+## 11. 🛠️ 参与贡献
+
+欢迎反馈问题、完善文档与翻译、贡献代码。参见[贡献指南](CONTRIBUTING_CN.md)，了解本地开发、针对性验证与 PR 流程。
 
 <a id="community"></a>
 
 <a id="社区"></a>
 
-## 11. 💬 社区
+## 12. 💬 社区
 
 SuperARIS 与 [ARIS 科研社区](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/blob/main/README_CN.md#community)共用同一个微信交流群，交流 Agent 协作与 AI 科研工作流。下方二维码直接引用 ARIS 上游维护的原图。
 
@@ -210,7 +217,7 @@ SuperARIS 与 [ARIS 科研社区](https://github.com/wanshuiyin/Auto-claude-code
 
 <a id="cite-aris"></a>
 
-## 12. 📖 Cite ARIS
+## 13. 📖 Cite ARIS
 
 SuperARIS 基于 ARIS 的科研流程、审阅机制与项目知识积累。如果这些能力帮助了你的研究，请引用 [ARIS 技术报告](https://arxiv.org/abs/2605.03042)：
 

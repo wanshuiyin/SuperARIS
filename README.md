@@ -195,10 +195,17 @@ The confirmed startup can install missing Herdr using its official Windows insta
 - [Skills, context, and recovery](docs/PROJECT_CONTEXT.md)
 - [Follow-up and project memory](docs/RESULTS_AND_MEMORY.md)
 - [ARIS source, dependencies, and updates](docs/DEPENDENCIES.md)
+- [Contributing and local development](CONTRIBUTING.md)
+
+<a id="contributing"></a>
+
+## 11. 🛠️ Contributing
+
+Bug reports, documentation, translations and code contributions are welcome. See [the contribution guide](CONTRIBUTING.md) for local development, focused checks and the PR workflow.
 
 <a id="community"></a>
 
-## 11. 💬 Community
+## 12. 💬 Community
 
 SuperARIS shares the [ARIS research community](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep#community). Join the same WeChat group to discuss agent collaboration and AI research workflows. The QR code below is maintained upstream by ARIS.
 
@@ -206,7 +213,7 @@ SuperARIS shares the [ARIS research community](https://github.com/wanshuiyin/Aut
 
 <a id="cite-aris"></a>
 
-## 12. 📖 Cite ARIS
+## 13. 📖 Cite ARIS
 
 SuperARIS builds on ARIS's research workflows, review mechanisms, and project knowledge. If you use this foundation in your research, please cite the [ARIS technical report](https://arxiv.org/abs/2605.03042):
 

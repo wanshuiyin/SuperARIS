@@ -12,7 +12,9 @@
 
 **Orca multi-model team:** [Interactive homepage](https://wanshuiyin.github.io/SuperARIS/?host=orca#workbench) · [English video](https://wanshuiyin.github.io/SuperARIS/media/orca-multi-demo-en.mp4) · [中文视频](https://wanshuiyin.github.io/SuperARIS/media/orca-multi-demo-zh.mp4). The [single-model team (3 Codex agents)](https://wanshuiyin.github.io/SuperARIS/orca-demo/?team=codex&lang=en) and its original [English](https://wanshuiyin.github.io/SuperARIS/media/orca-demo-en.mp4)/[中文](https://wanshuiyin.github.io/SuperARIS/media/orca-demo-zh.mp4) videos remain available.
 
-## Quick Start
+<a id="quick-start"></a>
+
+## 1. 🚀 Quick Start
 
 Have Python 3.10+, Git and [pipx](https://pipx.pypa.io/stable/installation/) ready, plus your chosen agent CLIs (`codex`, `claude`, `agy`) with model access configured. Install once, then open the wizard:
 
@@ -35,23 +37,29 @@ For an explicit start, open a new project's directory and choose one workbench:
 
 For Orca, install and open the [official app](https://www.onorca.dev/) first; if its CLI is unavailable, register it in **Settings → General → Orca CLI**. Reopening an existing project keeps its recorded workbench and team. [More installation options ↓](#install-and-open)
 
-## News
+<a id="news"></a>
 
-- **2026-11-14** — Update from the terminal with `superaris update --check` and `superaris update`: verify the actual Git commit, including same-version changes, while preserving project records and agent sessions. Refresh receiving through the original project commands ([#7](https://github.com/wanshuiyin/SuperARIS/pull/7), [guide](docs/DEPENDENCIES.md#updates)).
-- **2026-11-13** — **Bring Gemini into research from the start:** the expanded Research & Writing role spans ideas, methods and substantive paper writing, with new Carbon/Hydrogen model choices. Explicitly automation-owned AGY sessions on Herdr can pick up reports and continue in the same conversation. ARIS workflows, skills and MCP collaboration remain available ([#5](https://github.com/wanshuiyin/SuperARIS/pull/5), [#6](https://github.com/wanshuiyin/SuperARIS/pull/6)).
-- **2026-11-13** — Fixed partial team recovery: selecting members with `--only-role` now preserves recorded custom roles, clients and requested models, including interrupted startups ([#4](https://github.com/wanshuiyin/SuperARIS/pull/4)).
-- **2026-11-11** — Improved SSH experiment guidance: explicit handoffs, milestone-based verification and bounded troubleshooting. The default ARIS revision now includes source/config sync and working-environment reuse fixes ([#3](https://github.com/wanshuiyin/SuperARIS/pull/3), [ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)).
-- **2026-11-09** — Choose each role's client and model with Custom team, including AGY-led teams without Codex ([#2](https://github.com/wanshuiyin/SuperARIS/pull/2)).
-- **2026-11-09** — Inspect local usage by role and client with `superaris usage` ([#1](https://github.com/wanshuiyin/SuperARIS/pull/1), [guide](docs/USAGE.md)).
-- **2026-11-09** — Use the optional Orca workbench and compare multi-model / three-Codex demos ([setup](docs/ORCA.md), [interactive demo](https://wanshuiyin.github.io/SuperARIS/?host=orca#workbench)).
+## 2. 📢 News
 
-## Overview
+- **2026-11-14** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🔄 Update from the terminal with `superaris update --check` and `superaris update`: verify the actual Git commit, including same-version changes, while preserving project records and agent sessions. Refresh receiving through the original project commands ([#7](https://github.com/wanshuiyin/SuperARIS/pull/7), [guide](docs/DEPENDENCIES.md#updates)).
+- **2026-11-13** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🧠 **Bring Gemini into research from the start:** the expanded Research & Writing role spans ideas, methods and substantive paper writing, with new Carbon/Hydrogen model choices. Explicitly automation-owned AGY sessions on Herdr can pick up reports and continue in the same conversation. ARIS workflows, skills and MCP collaboration remain available ([#5](https://github.com/wanshuiyin/SuperARIS/pull/5), [#6](https://github.com/wanshuiyin/SuperARIS/pull/6)).
+- **2026-11-13** — ![FIX](https://img.shields.io/badge/FIX-2ea44f?style=flat-square) 🛠️ Fixed partial team recovery: selecting members with `--only-role` now preserves recorded custom roles, clients and requested models, including interrupted startups ([#4](https://github.com/wanshuiyin/SuperARIS/pull/4)).
+- **2026-11-11** — ![FIX](https://img.shields.io/badge/FIX-2ea44f?style=flat-square) 🔧 Improved SSH experiment guidance: explicit handoffs, milestone-based verification and bounded troubleshooting. The default ARIS revision now includes source/config sync and working-environment reuse fixes ([#3](https://github.com/wanshuiyin/SuperARIS/pull/3), [ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)).
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🤝 Choose each role's client and model with Custom team, including AGY-led teams without Codex ([#2](https://github.com/wanshuiyin/SuperARIS/pull/2)).
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📊 Inspect local usage by role and client with `superaris usage` ([#1](https://github.com/wanshuiyin/SuperARIS/pull/1), [guide](docs/USAGE.md)).
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🪟 Use the optional Orca workbench and compare multi-model / three-Codex demos ([setup](docs/ORCA.md), [interactive demo](https://wanshuiyin.github.io/SuperARIS/?host=orca#workbench)).
+
+<a id="overview"></a>
+
+## 3. ✨ Overview
 
 Discuss a research goal with your personal agent. It organizes a persistent team, delegates work, checks incoming results, and keeps track of what should happen next. Join any teammate's session to explore an idea, refine a draft, or take over.
 
 Built on [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) (Auto Research In Sleep, ~20k GitHub stars), SuperARIS equips each role with the research workflows and project context it needs. The team works within one project, with clear responsibilities and a record you can return to tomorrow.
 
-## One personal agent, a persistent team
+<a id="one-personal-agent-a-persistent-team"></a>
+
+## 4. 🤝 One personal agent, a persistent team
 
 Your main agent holds the research direction and coordinates the work. Codex can implement experiments and check evidence; Gemini can discuss the argument and write substantial paper sections. The main role can also execute or code directly within its authorized scope. Each collaborator has its own ongoing session, so you can work directly with the teammate you need and continue the discussion where you left off.
 
@@ -59,7 +67,9 @@ Every new team has three roles: main, engineer and **Research & Writing** (`writ
 
 The research-and-writing role can define problems, develop candidate methods and derivations, suggest experiments that distinguish hypotheses, and write the paper. For example, main delegates method discussion alongside a baseline experiment, checks the returned evidence, adjusts the next assignment, then collects evidence-backed writing for a fresh MCP review. Proposals and decisions stay in the existing project record. This responsibility works with any configured client or model.
 
-## ARIS for every teammate
+<a id="aris-for-every-teammate"></a>
+
+## 5. 🧩 ARIS for every teammate
 
 Each role receives its task, working area, ARIS navigation, and the relevant skills to read before acting. Ask the main agent to run a complete pipeline, delegate a connected workflow, or use one skill for a focused task.
 
@@ -73,7 +83,9 @@ Each role receives its task, working area, ARIS navigation, and the relevant ski
 
 These use your configured tools and keep ARIS's review and acceptance criteria. [Skills and project context →](docs/PROJECT_CONTEXT.md)
 
-## Follow up on the work
+<a id="follow-up-on-the-work"></a>
+
+## 6. ⚡ Follow up on the work
 
 SuperARIS tracks registered tasks, result files, and reports while the original main session is running—even after you close the workbench window. Your main agent uses those updates to collect finished work, check the evidence, and continue the next authorized step.
 
@@ -83,7 +95,9 @@ Human-controlled sessions receive notices. Explicitly automation-owned Codex ses
 
 *How the team, receiver, main agent and project records connect (Chinese labels). Click to view full size.*
 
-## Long-term project memory
+<a id="long-term-project-memory"></a>
+
+## 7. 🧠 Long-term project memory
 
 Keep the project's goals, decisions, corrections, results, and next actions in its existing notes and research wiki. Agents update these records as the work progresses and read them back when resuming. The context stays with the project across days and sessions, in files you can inspect and edit.
 
@@ -93,7 +107,9 @@ Reopen a running team to continue its conversations, or give a new session the p
 
 *Project files carry progress into later sessions (Chinese labels). Click to view full size.*
 
-## Install and open
+<a id="install-and-open"></a>
+
+## 8. 📦 Install and open
 
 Requires Python 3.10+ on macOS, Linux or Windows, [Herdr](https://herdr.dev) (default) or [optional Orca Terminal v1](docs/ORCA.md), and your chosen native CLIs (`codex`, `claude`, `agy`) with model access configured.
 
@@ -152,7 +168,9 @@ Help, plans and wizard cancellation do not fetch ARIS. See [source selection](do
 
 </details>
 
-## Windows
+<a id="windows"></a>
+
+## 9. 🪟 Windows
 
 Use native Windows Terminal / PowerShell with Python 3.10+ and Git:
 
@@ -166,7 +184,9 @@ superaris
 
 The confirmed startup can install missing Herdr using its official Windows installer. Native CLI login and trust remain interactive. A local wheel also works without Git. See [Windows setup, recovery, and support scope](docs/WINDOWS.md).
 
-## Guides
+<a id="guides"></a>
+
+## 10. 📚 Guides
 
 - [Optional local usage](docs/USAGE.md):`superaris usage PROJECT --by-role --json`
 
@@ -178,13 +198,15 @@ The confirmed startup can install missing Herdr using its official Windows insta
 
 <a id="community"></a>
 
-## Community
+## 11. 💬 Community
 
 SuperARIS shares the [ARIS research community](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep#community). Join the same WeChat group to discuss agent collaboration and AI research workflows. The QR code below is maintained upstream by ARIS.
 
 <img src="https://raw.githubusercontent.com/wanshuiyin/Auto-claude-code-research-in-sleep/main/docs/wechat_group.jpg" alt="ARIS shared research community WeChat QR code" width="300">
 
-## Cite ARIS
+<a id="cite-aris"></a>
+
+## 12. 📖 Cite ARIS
 
 SuperARIS builds on ARIS's research workflows, review mechanisms, and project knowledge. If you use this foundation in your research, please cite the [ARIS technical report](https://arxiv.org/abs/2605.03042):
 

@@ -14,7 +14,9 @@
 
 **Orca 多模型团队：**[主页交互版](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench) · [中文视频](https://wanshuiyin.github.io/SuperARIS/media/orca-multi-demo-zh.mp4) · [English video](https://wanshuiyin.github.io/SuperARIS/media/orca-multi-demo-en.mp4)。保留[单模型团队（3 个 Codex Agent）](https://wanshuiyin.github.io/SuperARIS/orca-demo/?team=codex&lang=zh)及其[中文](https://wanshuiyin.github.io/SuperARIS/media/orca-demo-zh.mp4)/[英文](https://wanshuiyin.github.io/SuperARIS/media/orca-demo-en.mp4)原视频。
 
-## 快速开始
+<a id="快速开始"></a>
+
+## 1. 🚀 快速开始
 
 准备好 Python 3.10+、Git 和 [pipx](https://pipx.pypa.io/stable/installation/)，以及已配置模型访问的所选 Agent CLI（`codex`、`claude`、`agy`）。安装一次，再打开向导：
 
@@ -37,23 +39,29 @@ superaris
 
 使用 Orca 前，先安装并打开[官方应用](https://www.onorca.dev/)；若 CLI 不可用，在 **Settings → General → Orca CLI** 注册命令。已有项目重入时保留原工作台与团队。[更多安装方式 ↓](#安装与启动)
 
-## 近期更新
+<a id="近期更新"></a>
 
-- **2026-11-14** — 新增终端自更新：用 `superaris update --check` 检查、`superaris update` 升级，按真实 Git commit 核验同版本新提交，保留项目记录与 Agent 会话；收件按原项目命令刷新（[#7](https://github.com/wanshuiyin/SuperARIS/pull/7)、[指南](docs/DEPENDENCIES.md#updates)）。
-- **2026-11-13** — **释放 Gemini 的研究潜力**：将写作角色拓展为“研究与写作”，让 Gemini 从研究构思、方法讨论到论文主写全程参与，并新增 Carbon／Hydrogen 模型选项。Herdr 中显式启用自动化的 AGY 常驻会话可收到报告后自动接续；原有 ARIS workflow、skills 与 MCP 协作保持可用（[#5](https://github.com/wanshuiyin/SuperARIS/pull/5)、[#6](https://github.com/wanshuiyin/SuperARIS/pull/6)）。
-- **2026-11-13** — 修复部分团队恢复：使用 `--only-role` 选择成员时，保留已记录的自定义角色、客户端与模型，包括中断后的启动恢复（[#4](https://github.com/wanshuiyin/SuperARIS/pull/4)）。
-- **2026-11-11** — 完善 SSH 实验派工、里程碑验收和排障收口；默认 ARIS 版本已纳入代码／配置同步与已有环境复用修复（[#3](https://github.com/wanshuiyin/SuperARIS/pull/3)、[ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)）。
-- **2026-11-09** — 自定义各角色的客户端与模型，支持 AGY 主控及无 Codex 团队（[#2](https://github.com/wanshuiyin/SuperARIS/pull/2)）。
-- **2026-11-09** — 用 `superaris usage` 按角色与客户端查看本地用量（[#1](https://github.com/wanshuiyin/SuperARIS/pull/1)、[指南](docs/USAGE.md)）。
-- **2026-11-09** — 可选 Orca 工作台，切换多模型／三 Codex 团队演示（[安装](docs/ORCA.md)、[交互演示](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench)）。
+## 2. 📢 近期更新
 
-## 项目简介
+- **2026-11-14** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🔄 新增终端自更新：用 `superaris update --check` 检查、`superaris update` 升级，按真实 Git commit 核验同版本新提交，保留项目记录与 Agent 会话；收件按原项目命令刷新（[#7](https://github.com/wanshuiyin/SuperARIS/pull/7)、[指南](docs/DEPENDENCIES.md#updates)）。
+- **2026-11-13** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🧠 **释放 Gemini 的研究潜力**：将写作角色拓展为“研究与写作”，让 Gemini 从研究构思、方法讨论到论文主写全程参与，并新增 Carbon／Hydrogen 模型选项。Herdr 中显式启用自动化的 AGY 常驻会话可收到报告后自动接续；原有 ARIS workflow、skills 与 MCP 协作保持可用（[#5](https://github.com/wanshuiyin/SuperARIS/pull/5)、[#6](https://github.com/wanshuiyin/SuperARIS/pull/6)）。
+- **2026-11-13** — ![FIX](https://img.shields.io/badge/FIX-2ea44f?style=flat-square) 🛠️ 修复部分团队恢复：使用 `--only-role` 选择成员时，保留已记录的自定义角色、客户端与模型，包括中断后的启动恢复（[#4](https://github.com/wanshuiyin/SuperARIS/pull/4)）。
+- **2026-11-11** — ![FIX](https://img.shields.io/badge/FIX-2ea44f?style=flat-square) 🔧 完善 SSH 实验派工、里程碑验收和排障收口；默认 ARIS 版本已纳入代码／配置同步与已有环境复用修复（[#3](https://github.com/wanshuiyin/SuperARIS/pull/3)、[ARIS #497](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/pull/497)）。
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🤝 自定义各角色的客户端与模型，支持 AGY 主控及无 Codex 团队（[#2](https://github.com/wanshuiyin/SuperARIS/pull/2)）。
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📊 用 `superaris usage` 按角色与客户端查看本地用量（[#1](https://github.com/wanshuiyin/SuperARIS/pull/1)、[指南](docs/USAGE.md)）。
+- **2026-11-09** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🪟 可选 Orca 工作台，切换多模型／三 Codex 团队演示（[安装](docs/ORCA.md)、[交互演示](https://wanshuiyin.github.io/SuperARIS/?host=orca&lang=zh#workbench)）。
+
+<a id="项目简介"></a>
+
+## 3. ✨ 项目简介
 
 和你的个人 Agent 讨论科研目标，让它组织团队、分配工作、核验成果，并跟进下一步。想深入讨论一个想法、共同修改一段正文，或亲自接手时，直接进入相应成员的会话。
 
 SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep)（Auto Research In Sleep，约 2 万 GitHub stars），为每个角色提供所需的科研流程与项目上下文。团队围绕同一个项目持续协作，分工清楚，研究记录随项目保存，明天回来还能接着做。
 
-## 一个个人 Agent，一支持续协作的团队
+<a id="一个个人-agent一支持续协作的团队"></a>
+
+## 4. 🤝 一个个人 Agent，一支持续协作的团队
 
 主 Agent 把握研究方向、组织分工并回收成果。Codex 可以实现实验与核查证据，Gemini 可以共同讨论立意、组织论证并主写论文正文。主 Agent 也可以在授权范围内直接执行任务或编码。每个成员都有自己的常驻会话，你可以直接与它共创，让讨论接着已有上下文继续。
 
@@ -61,7 +69,9 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 研究与写作角色可以定义问题、提出候选方法与推导草案、建议能区分假设的实验，并主写论文。例如主控并行派发方法讨论和基线实验，核验返回证据后调整后续派工，再组织基于结果的写作与 fresh MCP 审阅。待验证的想法、决定和交付沿原项目记录保存；这份职责可由任意已配置客户端或模型承担。
 
-## 每个成员都能使用 ARIS
+<a id="每个成员都能使用-aris"></a>
+
+## 5. 🧩 每个成员都能使用 ARIS
 
 各角色拿到自己的任务、工作范围、ARIS 导航和所需技能，在执行时读取相应流程。你可以让主 Agent 推进完整科研 pipeline，把一段 workflow 委派给协作者，也可以只调用一个 skill 处理眼前的问题。
 
@@ -75,7 +85,9 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 这些流程使用你已配置的工具，并保留 ARIS 原有的审阅和验收要求。[技能与项目上下文 →](docs/PROJECT_CONTEXT.md)
 
-## 主动跟进工作
+<a id="主动跟进工作"></a>
+
+## 6. ⚡ 主动跟进工作
 
 项目运行期间，SuperARIS 跟踪已登记的任务、结果文件和交付报告。原主会话仍在运行时，关闭工作台窗口也不打断跟进。主 Agent 根据这些更新收回完成的工作、核对证据，再推进下一项已授权步骤。
 
@@ -85,7 +97,9 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 *主动协作、验收与项目记录的接续机制。点击查看原图。*
 
-## 长期项目记忆
+<a id="长期项目记忆"></a>
+
+## 7. 🧠 长期项目记忆
 
 目标、决定、纠正、结果和下一步，保存在项目原有的笔记与 research wiki 中。Agent 随工作更新这些记录，恢复时重新读回。研究上下文跨天、跨会话留在项目里，你也可以直接查看和修改这些文件。
 
@@ -95,7 +109,9 @@ SuperARIS 基于 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-
 
 *项目文件承接跨天、跨会话的研究进度。点击查看原图。*
 
-## 安装与启动
+<a id="安装与启动"></a>
+
+## 8. 📦 安装与启动
 
 需要 Python 3.10+、macOS / Linux / Windows、[Herdr](https://herdr.dev)（默认）或[可选的 Orca Terminal v1 工作台](docs/ORCA.md)，以及配置好模型访问的所选原生 CLI（`codex`、`claude`、`agy`）。
 
@@ -154,7 +170,9 @@ SUPERARIS_ARIS_REPO=/path/to/aris superaris
 
 </details>
 
-## Windows
+<a id="windows"></a>
+
+## 9. 🪟 Windows
 
 原生 Windows Terminal / PowerShell 路径需要 Python 3.10+ 与 Git：
 
@@ -168,7 +186,9 @@ superaris
 
 确认启动后，可通过官方 Windows 安装器补装缺失的 Herdr。原生 CLI 的登录与信任由你交互完成；本地 wheel 安装无需 Git。[Windows 安装、恢复与支持范围 →](docs/WINDOWS.md)
 
-## 使用文档
+<a id="使用文档"></a>
+
+## 10. 📚 使用文档
 
 - [可选本地用量检测](docs/USAGE.md)：`superaris usage PROJECT --by-role --json`
 
@@ -180,13 +200,17 @@ superaris
 
 <a id="community"></a>
 
-## 社区
+<a id="社区"></a>
+
+## 11. 💬 社区
 
 SuperARIS 与 [ARIS 科研社区](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/blob/main/README_CN.md#community)共用同一个微信交流群，交流 Agent 协作与 AI 科研工作流。下方二维码直接引用 ARIS 上游维护的原图。
 
 <img src="https://raw.githubusercontent.com/wanshuiyin/Auto-claude-code-research-in-sleep/main/docs/wechat_group.jpg" alt="ARIS 共享科研交流群微信二维码" width="300">
 
-## Cite ARIS
+<a id="cite-aris"></a>
+
+## 12. 📖 Cite ARIS
 
 SuperARIS 基于 ARIS 的科研流程、审阅机制与项目知识积累。如果这些能力帮助了你的研究，请引用 [ARIS 技术报告](https://arxiv.org/abs/2605.03042)：
 

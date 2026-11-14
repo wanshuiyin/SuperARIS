@@ -598,7 +598,8 @@ def launch(plan: dict, args) -> dict | None:
                 from .client import Herdr
                 client = client_for_binding(binding(project), project, args.herdr_bin, herdr_factory=Herdr)
                 notify(client, tr("SuperARIS 启动未完成"),
-                       tr("原会话和选择已保留。退出客户端后可查看启动错误并继续处理。"))
+                       tr("启动错误：{error}\n原会话和选择已保留。详情：{path}",
+                          error=str(exc)[:240], path=directory(project) / "startup-error.json"))
             except (OSError, ValueError, RuntimeError):
                 pass
         finally:

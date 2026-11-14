@@ -262,7 +262,8 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
         try:
             subscriptions = reconcile()
         except (HerdrError, OSError) as exc:
-            result.update(reason="owner_or_server_unavailable", error=str(exc))
+            result.update(reason="owner_or_server_unavailable", error=str(exc),
+                          owner_state=getattr(exc, "owner_state", "unverified"))
             break
         if not check_signals():
             break
@@ -305,7 +306,8 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
             try:
                 reconcile()
             except (HerdrError, OSError) as exc:
-                result.update(reason="owner_or_server_unavailable", error=str(exc))
+                result.update(reason="owner_or_server_unavailable", error=str(exc),
+                              owner_state=getattr(exc, "owner_state", "unverified"))
                 break
             # Back off disconnected streams without starting a model or daemon.
             delay = max(0, min(interval, deadline - time.monotonic()))

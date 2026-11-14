@@ -12,7 +12,7 @@ import subprocess
 import sys
 import time
 
-from .client import Herdr, HerdrError, verify_owner
+from .client import Herdr, HerdrError, notify, verify_owner
 from .runtime import binding
 from .state import directory, read, write
 from . import __version__
@@ -156,6 +156,36 @@ class ProjectLifetime:
         return self.is_set()
 
 
+def _notify_owner_unavailable(project: Path, binary: str, record: dict) -> None:
+    """One best-effort host notice per ending generation, never pane input."""
+    current = binding(project)
+    if (selected_host(current) != "herdr" or record.get("owner_notice") or
+            not same_owner(record["owner"], signature(current))):
+        return
+    from .ui import tr
+    lang = current.get("ui_language", "zh")
+    state = record["outcome"].get("owner_state", "unverified")
+    summary = {
+        "shell": "主控窗格已回到 Shell，收件已暂停。",
+        "changed": "原主控身份已变化，收件已暂停。",
+    }.get(state, "暂时无法核实原主控或宿主连接，收件已暂停。")
+    path = directory(project) / "receiver.json"
+    text = tr(summary, lang=lang) + "\n" + tr(
+        "队友与任务已保留。请查看 {path}；确认原主控与连接后再恢复收件，更换进程需要显式交接。",
+        lang=lang, path=path)
+    notice = record["owner_notice"] = {"delivery": "attempting"}
+    write(path, record)
+    try:
+        client = client_for_binding(current, project, binary, herdr_factory=Herdr)
+        notify(client, tr("SuperARIS 收件已暂停", lang=lang), text)
+        notice["delivery"] = "visible_notice"
+    except (OSError, ValueError, RuntimeError) as exc:
+        # The host may itself be unavailable. Keep the diagnostic; do not
+        # retry an unknown notice or restart any owner/server to display it.
+        notice.update(delivery="unknown", error=str(exc))
+    write(path, record)
+
+
 def run(project: Path, generation: str, binary: str = "herdr") -> dict:
     """Internal child entry; never recreates a server or a native owner."""
     from .bridge import listen
@@ -192,10 +222,13 @@ def run(project: Path, generation: str, binary: str = "herdr") -> dict:
                     lifetime.wait(1)
             outcome["reason"] = lifetime.reason or outcome["reason"]
         except (OSError, ValueError, HerdrError) as exc:
-            outcome = {"reason": "owner_or_server_unavailable", "error": str(exc)}
+            outcome = {"reason": "owner_or_server_unavailable", "error": str(exc),
+                       "owner_state": getattr(exc, "owner_state", "unverified")}
         finally:
             record.update(status="stopped", outcome=outcome)
             write(root / "receiver.json", record)
+            if outcome.get("reason") == "owner_or_server_unavailable":
+                _notify_owner_unavailable(project, binary, record)
     finally:
         owner_lock.release()
     return record

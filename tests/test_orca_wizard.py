@@ -412,9 +412,9 @@ def test_first_blocked_check_uses_confirmed_explicit_launcher(monkeypatch, orca_
     fixture.args.orca_bin = '/original/non-PATH/orca'
     original = wizard._blocked
     seen = []
-    def blocked(project, binary):
+    def blocked(project, binary, *scope):
         seen.append(runtime.binding(project).get('orca_bin'))
-        return original(project,binary)
+        return original(project,binary,*scope)
     monkeypatch.setattr(wizard,'_blocked',blocked)
     monkeypatch.setattr('builtins.input',lambda _: '2')
     assert wizard.launch(fixture.plan,fixture.args) is None

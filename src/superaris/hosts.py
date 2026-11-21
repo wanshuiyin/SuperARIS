@@ -1,4 +1,4 @@
-"""The two supported workbenches; selection never starts or installs a host."""
+"""The supported workbenches; selection never starts or installs a host."""
 from __future__ import annotations
 
 import os
@@ -6,7 +6,8 @@ from pathlib import Path
 import shutil
 import sys
 
-HOSTS = ("herdr", "orca")
+HOSTS = ("herdr", "orca", "rex")
+GUI_HOSTS = ("orca", "rex")  # Native apps; startup waits for explicit readback.
 
 
 def selected_host(bound: dict, requested: str | None = None) -> str:
@@ -61,10 +62,19 @@ def orca_missing_action(found: dict) -> str:
     return "Install Orca from https://www.onorca.dev/download, open it, then resume this project."
 
 
-def client_for_binding(bound: dict, project: Path, binary: str = "herdr", *, orca_bin: str | None = None, herdr_factory=None):
+def discover_rex(explicit: str | None = None) -> dict:
+    from .rex import discover_rex as discover
+    return discover(explicit)
+
+
+def client_for_binding(bound: dict, project: Path, binary: str = "herdr", *, orca_bin: str | None = None,
+                       rex_bin: str | None = None, herdr_factory=None):
     if selected_host(bound) == "orca":
         from .orca import Orca
         return Orca(project, orca_bin or bound.get("orca_bin"), bound)
+    if selected_host(bound) == "rex":
+        from .rex import Rex
+        return Rex(project, rex_bin or bound.get("rex_bin"), bound)
     if herdr_factory is None:
         from .client import Herdr
         herdr_factory = Herdr
@@ -74,4 +84,18 @@ def client_for_binding(bound: dict, project: Path, binary: str = "herdr", *, orc
 def identity_present(role: dict) -> bool:
     if role.get("host") == "orca":
         return bool(role.get("pane_id") and role.get("runtime_id") and role.get("process_incarnation"))
+    if role.get("host") == "rex":
+        return bool(role.get("pane_id") and role.get("runtime_id") and role.get("pid"))
     return bool(role.get("pid"))
+
+
+def replay_launcher(arguments: list, host: str, cli: str) -> list:
+    """Replay the launcher the readiness check confirmed in place of a different recorded one."""
+    usable = lambda path: (discover_rex if host == "rex" else discover_orca)(path).get("cli")
+    option, replayed = f"--{host}-bin", list(arguments)
+    for index, argument in enumerate(replayed):
+        if argument == option and index + 1 < len(replayed) and usable(replayed[index + 1]) != cli:
+            replayed[index + 1] = cli
+        elif isinstance(argument, str) and argument.startswith(option + "=") and usable(argument.partition("=")[2]) != cli:
+            replayed[index] = f"{option}={cli}"
+    return replayed

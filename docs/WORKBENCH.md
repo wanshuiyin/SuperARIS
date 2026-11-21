@@ -47,7 +47,7 @@ ordinary reentry. Roles are responsibilities rather than client restrictions. Fo
 superaris start /path/to/project --role main=agy --role engineer=claude --role writer=agy --plan
 ```
 
-Add `--host orca` for a new Orca project, and repeat `--model ROLE=MODEL` as needed. The main role owns goals, delegation, acceptance and follow-up; engineering usually goes to the engineer, but main can also execute or code within its authorization and write scope. Changing a new-team selection does not migrate existing owners. Use `--only-role` to explicitly select a subset, as below:
+Add `--host orca` or `--host rex` for a new [Orca](ORCA.md) or [Rex](REX.md) project, and repeat `--model ROLE=MODEL` as needed. The main role owns goals, delegation, acceptance and follow-up; engineering usually goes to the engineer, but main can also execute or code within its authorization and write scope. Changing a new-team selection does not migrate existing owners. Use `--only-role` to explicitly select a subset, as below:
 
 ```bash
 superaris start /path/to/project --session research-demo --preset cc-codex --only-role main --only-role engineer --write-scope main=notes --write-scope engineer=outputs/engineer --role-task 'engineer=Implement the assigned stage in outputs/engineer' --task 'Coordinate the existing project task' --plan
@@ -79,7 +79,7 @@ for receipt and troubleshooting handoff boundaries.
 
 Human-owned roles receive visible notices by default. `start --automation-owned`
 marks new dedicated roles only; it never elevates an adopted owner. Explicitly
-automation-owned Codex roles and Herdr AGY roles support automatic follow-up
+automation-owned Codex roles and Herdr or Rex AGY roles support automatic follow-up
 when the original owner is idle and its verified input is empty. Herdr AGY uses
 the existing live TUI and receiver; it does not start a second headless writer.
 CC and Orca AGY follow-up remain notice-based. The input guard is best effort,
@@ -99,8 +99,10 @@ superaris resolve-delivery /path/to/project --role main --resolution received --
 ```
 
 Use `--resolution not-delivered` only after inspection confirms non-delivery.
-For an uncertain bridge signal use `--handle ID` instead of the role. The evidence
-file must exist in the project. Submitted context remains pending until explicit
+For an uncertain bridge signal use `--handle ID` instead of the role; for a context
+packet this also updates the role's own record. While that attempt is unknown the
+receiver pauses delivery, and the resolution waits for it to release its state; if
+a receiver is still delivering, stop it first. The evidence file must exist in the project. Submitted context remains pending until explicit
 received evidence; delivery does not establish scientific acceptance.
 
 On reconnect, omitted task/skills/recovery/scope preserve the original inputs;

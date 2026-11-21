@@ -1,4 +1,5 @@
 """Conservative input delivery: human panes receive a visible notice by default."""
+from contextlib import contextmanager
 from pathlib import Path
 import re
 
@@ -43,7 +44,24 @@ def empty_agy_input(text: str) -> bool:
         "", "Auto mode: edits & safe commands auto-approved (shift+tab to cycle)"}
 
 
-def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
+@contextmanager
+def input_turn(client, project: Path):
+    if getattr(client, "host", None) != "rex":
+        yield False
+        return
+    from .platform import FileLock
+    from .state import directory
+    lock = FileLock(directory(project) / "rex-input.lock").acquire()
+    client.input_turn_fd = lock.stream.fileno()  # Inherited by input supervisors; see rex_exec.execute.
+    try:
+        yield True
+    finally:
+        client.input_turn_fd = None
+        lock.release()
+
+
+def deliver(client: Herdr, project: Path, role: dict, prompt: str, renotify: bool = True) -> dict:
+    """`renotify=False` rechecks a signal whose notice is already visible without notifying again."""
     live = verify_owner(client, role, project)
     from .runtime import binding
     latest = binding(project).get("roles", {})
@@ -52,26 +70,39 @@ def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
     automation = role.get("automation_owned") and (role.get("_initial_bootstrap") or persisted is None or persisted.get("automation_owned"))
     revoke = False
     if automation and automatic_input_supported(client, live) and live["status"] in {"idle", "done"}:
-        view = read_screen(client, live["pane_id"])
-        parser = agy_input if live["harness"] == "agy" else codex_input
-        empty = empty_agy_input if live["harness"] == "agy" else empty_codex_input
-        if empty(view):
-            # Recheck the occupant/status after reading. This is a dedicated automation
-            # session, not a guarantee against a human concurrently typing after the read.
-            second = verify_owner(client, live, project)
-            current = binding(project).get("roles", {})
-            current_owner = next((record for record in current.values() if record.get("pane_id") == second["pane_id"]), None)
-            still_owned = role.get("_initial_bootstrap") or current_owner is None or current_owner.get("automation_owned")
-            if second["status"] in {"idle", "done"} and still_owned:
-                native_receipt = send_prompt(client, second["pane_id"], prompt)
-                receipt = {"delivery": "submitted", "pane_id": second["pane_id"], "acceptance": "not_evaluated"}
-                if getattr(client, "host", None) == "orca":
-                    receipt["native_receipt"] = native_receipt
-                return receipt
-        else:
-            # A startup splash without a composer is not a human draft.
-            # Wait for the known input surface; never type into the splash.
-            revoke = parser(view) is not None
+        # Rex pastes and presses Enter separately: one sender at a time reads the
+        # composer, rechecks ownership and submits, so none mistakes another's paste for a draft.
+        with input_turn(client, project) as locked:
+            if locked:
+                # Another sender may have submitted while this one waited for the turn.
+                live = verify_owner(client, live, project)
+            if live["status"] in {"idle", "done"}:
+                view = read_screen(client, live["pane_id"])
+                parser = agy_input if live["harness"] == "agy" else codex_input
+                empty = empty_agy_input if live["harness"] == "agy" else empty_codex_input
+                if empty(view):
+                    # Recheck the occupant/status after reading. This is a dedicated automation
+                    # session, not a guarantee against a human concurrently typing after the read.
+                    second = verify_owner(client, live, project)
+                    current = binding(project).get("roles", {})
+                    current_owner = next((record for record in current.values() if record.get("pane_id") == second["pane_id"]), None)
+                    still_owned = role.get("_initial_bootstrap") or current_owner is None or current_owner.get("automation_owned")
+                    if second["status"] in {"idle", "done"} and still_owned:
+                        try:
+                            native_receipt = send_prompt(client, second["pane_id"], prompt, owner=second)
+                        except HerdrError as exc:
+                            if getattr(exc, "code", None) != "not_sent":
+                                raise
+                            # The input changed before anything was typed; notify instead.
+                        else:
+                            receipt = {"delivery": "submitted", "pane_id": second["pane_id"], "acceptance": "not_evaluated"}
+                            if getattr(client, "host", None) in {"orca", "rex"}:
+                                receipt["native_receipt"] = native_receipt
+                            return receipt
+                else:
+                    # A startup splash without a composer is not a human draft.
+                    # Wait for the known input surface; never type into the splash.
+                    revoke = parser(view) is not None
     ui_language = binding(project).get("ui_language")
     if ui_language in {"zh", "en"}:
         from .ui import tr
@@ -80,11 +111,11 @@ def deliver(client: Herdr, project: Path, role: dict, prompt: str) -> dict:
         title = "ARIS work packet ready"
     # Only the notification chrome follows UI language. Its original packet
     # body and native delivery/unknown semantics stay unchanged.
-    notice = notify(client, title, prompt)
+    notice = notify(client, title, prompt) if renotify else {"repeated": True}
     receipt = {"delivery": "visible_notice", "pane_id": live["pane_id"],
             "revoke_automation": revoke,
             "reason": "Human-owned input, active/unknown state, or an unverified input surface; no keys sent",
             "acceptance": "not_evaluated"}
-    if getattr(client, "host", None) == "orca":
+    if getattr(client, "host", None) in {"orca", "rex"}:
         receipt["notice"] = notice
     return receipt

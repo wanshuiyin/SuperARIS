@@ -24,6 +24,9 @@ from .updater import installed_revision
 _REVISION = installed_revision()
 
 
+REX_IDENTITY = ("runtime_id", "execution_host", "rex_session")
+
+
 def implementation() -> dict:
     result = {"package": "superaris", "version": __version__, "path": str(Path(__file__).resolve().parent)}
     if _REVISION:
@@ -38,6 +41,9 @@ def signature(bound: dict) -> dict:
     if selected_host(bound) == "orca":
         identity.update(host="orca", execution_environment=bound.get("execution_environment", "local"),
                         **{key: main.get(key) for key in ("runtime_id", "process_incarnation", "execution_host", "pane_key")})
+    elif selected_host(bound) == "rex":
+        identity.update(host="rex", execution_environment=bound.get("execution_environment", "local"),
+                        **{key: main.get(key) for key in REX_IDENTITY})
     return identity
 
 
@@ -46,6 +52,9 @@ def same_owner(expected: dict, current: dict) -> bool:
         return False
     if expected.get("host") == "orca" and any(expected.get(key) != current.get(key) for key in
             ("execution_environment", "runtime_id", "process_incarnation", "execution_host", "pane_key")):
+        return False
+    if expected.get("host") == "rex" and any(expected.get(key) != current.get(key) for key in
+            ("execution_environment", *REX_IDENTITY)):
         return False
     if any(expected.get(key) != current.get(key) for key in ("session", "pane_id", "harness", "pid")):
         return False

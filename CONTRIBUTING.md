@@ -6,7 +6,7 @@ Thanks for helping improve SuperARIS. Bug reports, small reproductions, document
 
 ## Report a problem
 
-Include your OS, Python version, workbench host (Herdr or Orca), affected client (Claude Code, Codex or Antigravity), exact command, expected behavior and actual result. A small reproduction and a short redacted log are more useful than an entire session. Remove credentials, private paths and research data before posting.
+Include your OS, Python version, workbench host (Herdr, Orca or Rex), affected client (Claude Code, Codex or Antigravity), exact command, expected behavior and actual result. A small reproduction and a short redacted log are more useful than an entire session. Remove credentials, private paths and research data before posting.
 
 ## Set up a local checkout
 

@@ -204,7 +204,7 @@ def open_tab(project: Path, binary: str = "herdr", language: str | None = None) 
     project = project.expanduser().resolve()
     bound = read(directory(project) / "launch.json", {})
     if bound.get("host", "herdr") != "herdr":
-        raise ValueError("--tab is for existing Herdr teams; use --watch or --open for Orca")
+        raise ValueError("--tab is for existing Herdr teams; use --watch or --open for Orca or Rex")
     main = bound.get("roles", {}).get("main", {})
     if not bound.get("session") or not main.get("pane_id") or not main.get("pid"):
         raise ValueError("No recorded project owner identity; use --watch or --open without starting a team")

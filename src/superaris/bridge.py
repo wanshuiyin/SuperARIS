@@ -8,6 +8,7 @@ by retrying input blindly.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 import math
 from pathlib import Path
 import time
@@ -51,6 +52,99 @@ def _signal_current(project: Path, signal: dict) -> bool:
         from .tasks import handle_path
         return bool(read(handle_path(project, str(signal["id"])), {}).get("active"))
     return True
+
+
+RESOLVE_WAIT = 6  # A receiver stopped on an unknown attempt releases listen.lock every 2 s.
+
+
+def mirror_context_phase(current: dict, signal: dict, pane_id: str, phase: str, expect: set, **details) -> bool:
+    """Move a context packet's role record from an expected phase, so a later
+    start sees the same attempting/unknown state and never submits it again."""
+    record = current.get("roles", {}).get(signal.get("context_role"), {})
+    if (record.get("pane_id") != pane_id or record.get("context", {}).get("packet") != signal.get("packet")
+            or record.get("delivery", {}).get("phase") not in expect):
+        return False
+    record["delivery"].update(phase=phase, **details)
+    if phase in {"submitted", "received"}:
+        record.pop("bootstrap_pending", None)
+    if phase == "received":
+        record["pending_context"] = None
+    return True
+
+
+def _mirror(project: Path, signal: dict, pane_id: str, phase: str, expect: set, **details) -> dict | None:
+    from .runtime import save_binding
+    from .state import launch_lock
+    with launch_lock(project):  # ValueError while a launcher owns the project.
+        current = binding(project)
+        if mirror_context_phase(current, signal, pane_id, phase, expect, **details):
+            save_binding(project, current)
+            return current
+    return None
+
+
+@contextmanager
+def quiet_listener(project: Path):
+    """Hold listen.lock so a receiver's older bridge snapshot cannot overwrite a
+    resolution. Take it before the launch lock: a receiver may need that lock."""
+    from .platform import FileLock, LockBusy
+    deadline = time.monotonic() + RESOLVE_WAIT
+    while True:
+        try:
+            listener = FileLock(directory(project) / "listen.lock", blocking=False).acquire()
+            break
+        except LockBusy:
+            if time.monotonic() > deadline:
+                raise ValueError("A receiver is delivering for this project; stop it "
+                                 "(receiver PROJECT --action stop), then resolve again") from None
+            time.sleep(0.05)
+    try:
+        yield
+    finally:
+        listener.release()
+
+
+def role_attempt(project: Path, role: str, key: str = "attempts") -> str | None:
+    """The bridge handle of an unknown attempt at this role's current context packet,
+    or with key="settles", of a known outcome not yet written back to the role."""
+    record = binding(project).get("roles", {}).get(role, {})
+    for handle, attempt in read(directory(project) / "bridge.json", {}).get(key, {}).items():
+        signal = attempt.get("signal") or {}
+        if (signal.get("context_role") == role and signal.get("packet") == record.get("context", {}).get("packet")
+                and attempt.get("pane_id") == record.get("pane_id")):
+            return handle
+    return None
+
+
+def resolve_attempt(project: Path, handle: str, resolution: str, evidence: Path) -> dict:
+    """Clear one inspected unknown attempt under quiet_listener and the launch lock."""
+    path = directory(project) / "bridge.json"
+    state = read(path, {})
+    attempt = state.get("attempts", {}).pop(handle, None)
+    if not attempt:
+        raise ValueError("No unknown bridge delivery for this handle")
+    state.setdefault("resolutions", []).append({**attempt, "resolution": resolution, "evidence": str(evidence)})
+    if resolution == "received":
+        state.get("deferred", {}).pop(handle, None)  # Received input must never be submitted again.
+        state.setdefault("delivered", {})[handle] = {"signal": attempt["signal"], "pane_id": attempt["pane_id"], "delivery": "visible_notice"}
+        if "observed" in attempt["signal"]:
+            from .tasks import handle_path
+            pointer = handle_path(project, attempt["signal"]["id"])
+            observed = read(pointer)
+            if observed:
+                observed.update(attempt["signal"]["observed"], last_delivery={"delivery": "received", "evidence": str(evidence)})
+                write(pointer, observed)
+    if attempt["signal"].get("context_role"):
+        from .runtime import save_binding
+        current = binding(project)
+        unsent = {"attempting", "unknown", "visible_notice", "prepared"}
+        # A later start may have submitted the same packet; received evidence confirms that too.
+        if mirror_context_phase(current, attempt["signal"], attempt["pane_id"], "received" if resolution == "received"
+                                else "prepared", unsent | {"submitted"} if resolution == "received" else unsent,
+                                evidence=str(evidence)):
+            save_binding(project, current)
+    write(path, state)
+    return {"handle": handle, "resolution": resolution, "evidence": str(evidence)}
 
 
 def _event_type(event: dict) -> str | None:
@@ -132,6 +226,8 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
         roles = current.get("roles", {})
         if not roles.get("main"):
             raise HerdrError("Project no longer has a main owner")
+        if getattr(client, "host", None) == "rex":
+            client.bind(current)  # Subscribe roles a later start added to this team.
         snapshot = client.snapshot()
         panes = {agent.get("pane_id") for agent in snapshot.get("agents", [])}
         if roles["main"].get("pane_id") not in panes:
@@ -151,10 +247,36 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
             subscriptions.append({"type": "pane.agent_status_changed", "pane_id": role["pane_id"]})
         return subscriptions
 
+    def settle(signal_id: str, signal: dict, pane_id: str, phase: str, **details) -> dict | None:
+        """Mirror a claimed packet's outcome; while a launcher holds the lock it waits here."""
+        if not signal.get("context_role"):
+            return None
+        try:
+            updated = _mirror(project, signal, pane_id, phase, {"attempting"}, **details)
+        except ValueError:
+            state.setdefault("settles", {})[signal_id] = {"signal": dict(signal), "pane_id": pane_id,
+                                                          "phase": phase, "details": details}
+            write(state_path, state)
+            return None
+        if state.get("settles", {}).pop(signal_id, None):
+            write(state_path, state)
+        return updated
+
     def check_signals() -> bool:
         nonlocal bound
+        for signal_id, item in list(state.get("settles", {}).items()):
+            settle(signal_id, item["signal"], item["pane_id"], item["phase"], **item["details"])
+        for signal_id, attempt in attempts.items():
+            if (attempt.get("signal") or {}).get("context_role"):
+                # Its role now records the unknown too, so no signal re-raises it.
+                result.update(reason="unknown_requires_inspection", pending_unknown=signal_id, attempt=attempt,
+                              error="An earlier context delivery outcome is unknown. Inspect the actual owner input/receipt before explicitly clearing this attempt; no input was resent.")
+                return False
         changed = False
+        settles = state.setdefault("settles", {})  # Their role phase is not yet written back.
         for identifier, signal in list(deferred.items()):
+            if identifier in settles:
+                continue
             owner = bound["roles"].get(signal.get("owner_role") or "main", {})
             if not owner.get("automation_owned") or not automatic_input_supported(client, owner) or not _signal_current(project, signal):
                 del deferred[identifier]
@@ -166,6 +288,8 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
         for signal_id, signal in signals.items():
             if stopped():
                 return False
+            if signal_id in settles:
+                continue
             if not _signal_current(project, signal):
                 if deferred.pop(signal_id, None) is not None:
                     write(state_path, state)
@@ -185,7 +309,12 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
             automation = role.get("automation_owned") and automatic_input_supported(client, role)
             if signal.get("context_role") and not previous and automation:
                 # Runtime has already displayed this context's notice.
-                previous = {"signal": signal, "pane_id": role["pane_id"], "delivery": "visible_notice"}
+                # The receipt of the packet this signal came from, read as fresh as the signal itself.
+                source = binding(project).get("roles", {}).get(signal["context_role"], {})
+                receipt = (source.get("delivery", {}).get("receipt")
+                           if source.get("context", {}).get("packet") == signal.get("packet") else None)
+                previous = {"signal": signal, "pane_id": role["pane_id"], "delivery": "visible_notice",
+                            **({"receipt": receipt} if receipt else {})}
                 delivered[signal_id] = previous
                 deferred[signal_id] = signal
                 write(state_path, state)
@@ -197,16 +326,30 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
                     continue
                 if verify_owner(client, role, project)["status"] not in {"idle", "done"}:
                     continue
+            # This exact signal's notice is already visible: recheck, never re-notify.
+            notified = (previous.get("signal") == signal and previous.get("pane_id") == role["pane_id"]
+                        and previous.get("delivery") == "visible_notice")
             # Re-read original state immediately before initiating delivery;
             # fresh signals can also become obsolete during reconciliation.
             if not _signal_current(project, signal):
                 if deferred.pop(signal_id, None) is not None:
                     write(state_path, state)
                 continue
+            # The attempt is persisted before its role claim, so a crash between
+            # the two leaves a resolvable handle rather than an orphaned claim.
             attempts[signal_id] = {"signal": dict(signal), "pane_id": role["pane_id"], "status": "attempted"}
             write(state_path, state)
+            if signal.get("context_role"):
+                try:
+                    claimed = _mirror(project, signal, role["pane_id"], "attempting", {"visible_notice", "prepared"})
+                except ValueError:
+                    claimed = None  # A launcher owns the role record; it decides delivery.
+                if not claimed:
+                    del attempts[signal_id]
+                    write(state_path, state)
+                    continue
             try:
-                receipt = deliver(client, project, role, signal["prompt"])
+                receipt = deliver(client, project, role, signal["prompt"], **({"renotify": False} if notified else {}))
             except (HerdrError, OSError) as exc:
                 # Unknown send outcomes require reconciliation, never an automatic
                 # second input submission in this invocation.
@@ -214,11 +357,13 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
                 if getattr(exc, "response", None):
                     attempts[signal_id]["native_response"] = exc.response
                 write(state_path, state)
+                settle(signal_id, signal, role["pane_id"], "unknown", error=str(exc))
                 result.update(reason="unknown_requires_inspection", error=str(exc), pending_unknown=signal_id)
                 return False
             if receipt.get("delivery") not in {"submitted", "visible_notice"}:
                 attempts[signal_id].update(status="unknown", receipt=receipt)
                 write(state_path, state)
+                settle(signal_id, signal, role["pane_id"], "unknown")
                 result.update(reason="unknown_requires_inspection", pending_unknown=signal_id)
                 return False
             if receipt.get("revoke_automation"):
@@ -236,20 +381,23 @@ def _listen(project: Path, binary: str, duration: float | None, interval: float,
                 deferred.pop(signal_id, None)
             delivered[signal_id] = {"signal": dict(signal), "pane_id": role["pane_id"],
                                     "delivery": receipt["delivery"]}
-            if getattr(client, "host", None) == "orca":
+            if getattr(client, "host", None) in {"orca", "rex"}:
+                if notified and receipt.get("notice", {}).get("repeated"):
+                    # A recheck raised no notice; keep the original one's receipt (and any alert error).
+                    receipt["notice"] = previous.get("receipt", {}).get("notice", receipt["notice"])
                 delivered[signal_id]["receipt"] = receipt
+            submitted = receipt["delivery"] == "submitted"
+            details = {"receipt": receipt} if submitted else {}
+            if signal.get("context_role"):
+                # Persisted with the attempt's removal, so a crash before the role
+                # write-back still leaves a known outcome to replay.
+                state.setdefault("settles", {})[signal_id] = {"signal": dict(signal), "pane_id": role["pane_id"],
+                                                              "phase": receipt["delivery"], "details": details}
             del attempts[signal_id]
             write(state_path, state)
-            if signal.get("context_role") and receipt["delivery"] == "submitted":
-                from .runtime import save_binding
-                from .state import launch_lock
-                with launch_lock(project):
-                    current = binding(project)
-                    record = current.get("roles", {}).get(signal["context_role"], {})
-                    if record.get("pane_id") == role["pane_id"] and record.get("context", {}).get("packet") == signal["packet"]:
-                        record.setdefault("delivery", {}).update(phase="submitted", receipt=receipt)
-                        save_binding(project, current)
-                        bound = current
+            updated = settle(signal_id, signal, role["pane_id"], receipt["delivery"], **details)
+            if updated and submitted:
+                bound = updated
             _mark_notified(project, signal, receipt)
             result["deliveries"].append({"id": signal_id, **receipt})
         return True

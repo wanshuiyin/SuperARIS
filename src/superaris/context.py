@@ -233,12 +233,13 @@ def _navigation(project, role, harness, task, scopes, repo, run, skill_index, or
     navigation = run / "navigation.md"
     host_instructions = f"Workbench host: **{workbench_host}**. Recover its original identity from launch.json; do not infer the host from the agent harness.\n\n"
     host_reference = None
-    if workbench_host == "orca":
+    if workbench_host in {"orca", "rex"}:
         resource_host = "codex" if harness == "codex" else "claude"
-        source = Path(__file__).resolve().parent / "resources" / resource_host / "project-agent/references/orca-host.md"
+        source = Path(__file__).resolve().parent / "resources" / resource_host / f"project-agent/references/{workbench_host}-host.md"
         host_reference = run / "workbench-host.md"
         shutil.copyfile(source, host_reference)
-        host_instructions += f"Before operating Orca, read `{host_reference}`. This host entry applies even when a project-customized project-agent skill takes precedence. Use the Orca terminal binding, not Herdr environment markers or pane commands.\n\n"
+        label, binding = {"orca": ("Orca", "Orca terminal binding"), "rex": ("Rex", "Rex block binding")}[workbench_host]
+        host_instructions += f"Before operating {label}, read `{host_reference}`. This host entry applies even when a project-customized project-agent skill takes precedence. Use the {binding}, not Herdr environment markers or pane commands.\n\n"
     local_index = "\n".join(f"- {name}: `{path}`" for name, path in skill_index.items())
     navigation.write_text(
         "# ARIS navigation for every role\n\n"
@@ -312,7 +313,7 @@ def prepare_context(
         raise ValueError(f"Project directory does not exist: {project}")
     if workbench_host is None:
         workbench_host = (read(_within(project / ".aris/workbench/launch.json", project, "Workbench binding"), {}) or {}).get("host", "herdr")
-    if workbench_host not in {"herdr", "orca"}:
+    if workbench_host not in {"herdr", "orca", "rex"}:
         raise ValueError(f"Unsupported workbench host: {workbench_host!r}")
     role = _name(role, "role")
     if harness not in {"codex", "claude", "agy"}:

@@ -456,3 +456,31 @@ def test_superseded_context_does_not_submit_old_deferred_packet(running, monkeyp
     state = read(directory(project) / "bridge.json")
     assert not state["deferred"]
     assert state["delivered"] == history
+
+
+@pytest.mark.parametrize("phase,claimed", [("visible_notice", True), ("prepared", True), ("attempting", False),
+                                           ("unknown", False), ("submitted", False)])
+def test_context_claim_moves_only_an_unsent_packet(phase, claimed):
+    signal = {"context_role": "main", "packet": "context/main/0001/packet.md"}
+    current = {"roles": {"main": {"pane_id": "p1", "context": {"packet": signal["packet"]}, "bootstrap_pending": True,
+                                  "pending_context": signal["packet"], "delivery": {"phase": phase}}}}
+    # A concurrent start may have submitted the packet after the receiver read it as current.
+    assert bridge.mirror_context_phase(current, signal, "p1", "attempting", {"visible_notice", "prepared"}) is claimed
+    assert current["roles"]["main"]["delivery"]["phase"] == ("attempting" if claimed else phase)
+    record = current["roles"]["main"]
+    if claimed:
+        assert bridge.mirror_context_phase(current, signal, "p1", "submitted", {"attempting"})
+        assert "bootstrap_pending" not in record and record["pending_context"] == signal["packet"]
+    else:
+        assert record["bootstrap_pending"]
+
+
+def test_received_report_leaves_no_deferred_resend(tmp_path):
+    signal = {"id": "late", "prompt": "ARIS registered task late"}
+    write(directory(tmp_path) / "bridge.json", {"deferred": {"late": signal, "other": {"id": "other"}},
+                                                "attempts": {"late": {"signal": signal, "pane_id": "p1", "status": "unknown"}}})
+    evidence = tmp_path / "seen.txt"
+    evidence.write_text("The report is in the owner's transcript.\n")
+    bridge.resolve_attempt(tmp_path, "late", "received", evidence)
+    state = read(directory(tmp_path) / "bridge.json")
+    assert list(state["deferred"]) == ["other"] and state["delivered"]["late"]["delivery"] == "visible_notice"

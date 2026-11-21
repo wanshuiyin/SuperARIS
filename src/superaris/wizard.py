@@ -30,6 +30,7 @@ class Selection:
 
 LABELS = {"codex": "Codex", "claude": "Claude Code（CC）", "agy": "Antigravity（AGY）"}
 ROLES = ui.ROLE_LABELS
+HOST_LABELS = {"herdr": "Herdr", "orca": "Orca", "rex": "Rex"}
 COMBINATIONS = [
     ("仅 Codex（三角色）", "codex", [("main", "codex"), ("engineer", "codex"), ("writer", "codex")]),
     ("CC + Codex（三角色）", "cc-codex", [("main", "claude"), ("engineer", "codex"), ("writer", "claude")]),
@@ -64,21 +65,22 @@ def choose(prompt: str, options: list[str], default: int = 1) -> int:
 
 
 def capabilities() -> dict[str, str | None]:
-    from .hosts import discover_orca
+    from .hosts import discover_orca, discover_rex
     available = {kind: shutil.which(kind) for kind in ("herdr", "codex", "claude", "agy", "brew")}
     found = discover_orca()
-    available.update(orca=found.get("cli"), orca_app=found.get("app"))
+    available.update(orca=found.get("cli"), orca_app=found.get("app"), rex=discover_rex().get("cli"))
     return available
 
 
 def select_workbench(available: dict, previous: str | None = None) -> str:
     """Choose only for a new project; discovery never probes a running host."""
-    if available.get("herdr") and available.get("orca"):
-        return ("herdr", "orca")[choose(tr("工作台宿主"), [tr("Herdr（推荐）"), "Orca"],
-                                        2 if previous == "orca" else 1) - 1]
-    if available.get("orca"):
-        return "orca"
-    if not available.get("herdr") and available.get("orca_app"):
+    hosts = [host for host in HOST_LABELS if available.get(host)]
+    if len(hosts) > 1:
+        labels = [tr("Herdr（推荐）") if host == "herdr" else HOST_LABELS[host] for host in hosts]
+        return hosts[choose(tr("工作台宿主"), labels, hosts.index(previous) + 1 if previous in hosts else 1) - 1]
+    if hosts:
+        return hosts[0]
+    if available.get("orca_app"):
         # The installed app needs command registration, not a different host.
         return "orca"
     # Preserve Herdr's working installation path when neither CLI was found.
@@ -87,23 +89,25 @@ def select_workbench(available: dict, previous: str | None = None) -> str:
 
 def recovery_capabilities(available: dict, bound: dict) -> dict:
     """Resolve the original executable using files only, never native status."""
-    from .hosts import discover_orca
+    from .hosts import discover_orca, discover_rex, selected_host
+    host = selected_host(bound)
     pending = bound.get("pending_start") or {}
-    explicit = bound.get("orca_bin") or pending.get("orca_bin")
+    explicit = bound.get(f"{host}_bin") or pending.get(f"{host}_bin")
     if not explicit:
         arguments = pending.get("arguments", [])
         if isinstance(arguments, list):
             for index, argument in enumerate(arguments):
-                if argument == "--orca-bin" and index + 1 < len(arguments):
+                if argument == f"--{host}-bin" and index + 1 < len(arguments):
                     explicit = arguments[index + 1]
                     break
-                if isinstance(argument, str) and argument.startswith("--orca-bin="):
+                if isinstance(argument, str) and argument.startswith(f"--{host}-bin="):
                     explicit = argument.partition("=")[2]
                     break
     if not explicit:
         return available
-    found = discover_orca(explicit)
-    return {**available, "orca": found.get("cli"), "orca_recorded": explicit}
+    found = (discover_rex if host == "rex" else discover_orca)(explicit)
+    return {**available, host: found.get("cli"), f"{host}_recorded": explicit}
+
 
 
 def show_capabilities(available: dict) -> None:
@@ -125,6 +129,16 @@ def dependency_summary(available: dict, host: str = "herdr") -> bool:
             print(tr("Orca 应用已安装；请打开 Settings → General → Orca CLI 注册命令，再继续这个项目。"))
         else:
             print(tr("Orca CLI 未找到；请从 https://www.onorca.dev/download 安装并打开 Orca，再继续这个项目。"))
+        return False
+    if host == "rex":
+        if available.get("rex"):
+            print(tr("Rex：已找到 CLI；启动时核对本机服务，沿用你的模型与登录配置。"))
+            return True
+        if available.get("rex_recorded"):
+            print(tr("原项目 Rex CLI 入口不可用：{path}。请核对原入口，或用 --rex-bin 明确指定可用 CLI 后继续。",
+                     path=available["rex_recorded"]))
+        else:
+            print(tr("Rex CLI 未找到；请从 https://www.superlogical.com/rex/ 安装并打开 Rex，再继续这个项目。"))
         return False
     if host != "herdr":
         raise ValueError(f"Unknown workbench: {host}")
@@ -277,7 +291,7 @@ def run() -> Selection | None:
             old = binding(project) if project.is_dir() else {}
             if old:
                 host = selected_host(old)
-                if host == "orca":
+                if host != "herdr":
                     available = recovery_capabilities(available, old)
                 pending = old.get("pending_start")
                 if not old.get("session") or (not old.get("roles", {}).get("main") and not pending):
@@ -299,7 +313,7 @@ def run() -> Selection | None:
                     return None
                 print(tr("\n[4/4] 恢复摘要"))
                 print(tr("项目：{project}\n操作：继续原负责人和未完事项；保留任务、模型与现有窗口。", project=project))
-                print(tr("宿主：{host}", host="Orca" if host == "orca" else "Herdr"))
+                print(tr("宿主：{host}", host=HOST_LABELS[host]))
                 ready = dependency_summary(available, host)
                 action = choose(tr("请选择"), [tr("启动（继续原工作台）"), tr("返回修改"), tr("取消")])
                 if action == 2:
@@ -310,15 +324,18 @@ def run() -> Selection | None:
                     arguments = pending["arguments"]
                     if not isinstance(arguments, list) or arguments[:2] != ["start", str(project)]:
                         raise ValueError(tr("待完成启动记录与当前项目不符"))
+                    if host != "herdr":
+                        from .hosts import replay_launcher
+                        arguments = replay_launcher(arguments, host, available[host])
                     return Selection(arguments, False, ui_language=ui.language)
                 arguments = ["start", str(project), "--session", old["session"]]
-                if host == "orca":
-                    arguments += ["--host", "orca"]
+                if host != "herdr":
+                    arguments += ["--host", host]
                 return Selection(arguments, False, True, ui.language)
 
             host = select_workbench(available, host_choices.get(project))
             host_choices[project] = host
-            if host == "orca" and not available.get("orca"):
+            if host != "herdr" and not available.get(host):
                 dependency_summary(available, host)
                 return None
             print(tr("\n[2/4] 客户端组合与模型"))
@@ -366,7 +383,7 @@ def run() -> Selection | None:
             print(tr("\n[4/4] 启动摘要"))
             print(tr("项目：{project}{created}", project=project, created=tr("（启动时创建）") if not project.exists() else ""))
             print(tr("工作台：SuperARIS · {name}", name=name))
-            print(tr("宿主：{host}", host="Orca" if host == "orca" else "Herdr"))
+            print(tr("宿主：{host}", host=HOST_LABELS[host]))
             for role, kind in roles:
                 scope = tr("项目统筹与验收（协作者目录除外）") if role == "main" else tr("{scope}（独占）", scope=f"outputs/{role}")
                 print(f"  {ui.role_label(role)} / {tr(LABELS[kind])} / {chosen[role] or tr('沿用 CLI 配置')} → {scope}")
@@ -375,8 +392,9 @@ def run() -> Selection | None:
             if any(kind == "claude" for _, kind in roles):
                 print(tr("CC 收到后续结果时会提示你查看。"))
             if any(kind == "agy" for _, kind in roles):
-                print(tr("AGY 默认通过通知收件；Herdr 中显式交给自动化后，可在已验证的空闲空输入框接续。")
-                      if host == "herdr" else tr("Orca 中的 AGY 收到后续结果时会提示你查看。"))
+                print({"herdr": tr("AGY 默认通过通知收件；Herdr 中显式交给自动化后，可在已验证的空闲空输入框接续。"),
+                       "rex": tr("AGY 默认通过通知收件；Rex 中显式交给自动化后，可在已验证的空闲空输入框接续。"),
+                       }.get(host) or tr("Orca 中的 AGY 收到后续结果时会提示你查看。"))
             ready = dependency_summary(available, host)
             action = choose(tr("请选择"), [tr("启动"), tr("返回修改"), tr("取消")])
             if action == 2:
@@ -389,8 +407,8 @@ def run() -> Selection | None:
             else:
                 for role, kind in roles:
                     arguments += ["--role", f"{role}={kind}"]
-            if host == "orca":
-                arguments += ["--host", "orca"]
+            if host != "herdr":
+                arguments += ["--host", host]
             waiting = "Read this project's role packet and selected ARIS skills, then wait for the user's concrete task. Do not start a research pipeline, workflow, model delegation or Goal."
             collaborator_waiting = "Read this project's role packet and selected ARIS skills, then wait for the main owner's scoped assignment. Do not execute the main task or edit project artifacts yet."
             arguments += ["--task", task or waiting]
@@ -407,10 +425,10 @@ def run() -> Selection | None:
             print(tr("无法读取这个项目：{error}。请重新选择，或 q 取消。", error=exc))
 
 
-def _blocked(project: Path, binary: str) -> tuple[object, list[tuple[str, dict]]]:
+def _blocked(project: Path, binary: str, roles: set[str] | None = None) -> tuple[object, list[tuple[str, dict]]]:
     from .client import Herdr, HerdrError, read_screen, verify_owner
     from .delivery import codex_input
-    from .hosts import client_for_binding
+    from .hosts import GUI_HOSTS, client_for_binding
     from .runtime import binding, save_binding
     from .state import launch_lock
     with launch_lock(project):
@@ -418,12 +436,13 @@ def _blocked(project: Path, binary: str) -> tuple[object, list[tuple[str, dict]]
         client = client_for_binding(current, project, binary, herdr_factory=Herdr)
         waiting = []
         for role, record in current.get("roles", {}).items():
-            if not record.get("created"):
+            # Only this start's roles and main gate it; an unselected closed collaborator does not.
+            if not record.get("created") or roles and role not in roles:
                 continue
             try:
                 live = verify_owner(client, record, project)
             except HerdrError:
-                if current.get("host") == "orca":
+                if current.get("host") in GUI_HOSTS:
                     raise
                 continue
             # Pin the observed native process before handing the user the TUI.
@@ -433,7 +452,7 @@ def _blocked(project: Path, binary: str) -> tuple[object, list[tuple[str, dict]]
             if live["status"] == "blocked":
                 live["startup_wait"] = "native_prompt"
             if (live["harness"] == "agy" or live.get("bootstrap_pending")
-                    or current.get("host") == "orca" and live["status"] == "blocked"):
+                    or current.get("host") in GUI_HOSTS and live["status"] == "blocked"):
                 view = read_screen(client, live["pane_id"])
                 if live["harness"] == "agy" and all(value in view for value in (
                         "Do you trust the contents of this project?", "Yes, I trust this folder", "No, exit")):
@@ -447,8 +466,8 @@ def _blocked(project: Path, binary: str) -> tuple[object, list[tuple[str, dict]]
     return client, waiting
 
 
-def _launch_orca(plan: dict, args) -> dict | None:
-    """Orca's UI opener returns immediately; continue only on explicit readback."""
+def _launch_gui(plan: dict, args, host: str) -> dict | None:
+    """A native app's UI opener returns immediately; continue only on explicit readback."""
     from .client import HerdrError
     from .hosts import identity_present
     from .runtime import binding, save_binding, start
@@ -457,14 +476,15 @@ def _launch_orca(plan: dict, args) -> dict | None:
 
     ui.set_language(getattr(args, "ui_language", ui.language))
     project = Path(plan["project"])
+    scope = {"main", *(role["role"] for role in plan["roles"] if role["active"])}
     print(tr("\n正在准备项目、ARIS 技能与所选角色…"), flush=True)
     with launch_lock(project):
         current = binding(project) or {"project": str(project), "session": plan["session"],
-                                       "preset": plan["preset"], "host": "orca", "roles": {}}
-        if getattr(args, "orca_bin", None):
+                                       "preset": plan["preset"], "host": host, "roles": {}}
+        if getattr(args, f"{host}_bin", None):
             # A pending explicit launcher may be outside PATH. The first
             # read-only blocked check must use that same confirmed entry.
-            current["orca_bin"] = args.orca_bin
+            current[f"{host}_bin"] = getattr(args, f"{host}_bin")
         if not current.get("pending_start") and not args.wizard_resume_existing:
             current["pending_start"] = {"arguments": args.wizard_arguments,
                                         "roles": [role for role in plan["roles"] if role["active"]]}
@@ -476,19 +496,27 @@ def _launch_orca(plan: dict, args) -> dict | None:
             return None
         return stop_receiver(project) if args.no_receiver else ensure_receiver(project, args.herdr_bin)
 
+    bootstrap_retried = False
     try:
         while True:
-            client, waiting = _blocked(project, args.herdr_bin)
+            client, waiting = _blocked(project, args.herdr_bin, scope)
             if not waiting:
                 try:
                     result = start(plan, args)
                 except HerdrError as exc:
                     write(directory(project) / "startup-error.json", {"error": str(exc)})
-                    client, waiting = _blocked(project, args.herdr_bin)
+                    client, waiting = _blocked(project, args.herdr_bin, scope)
                     if not waiting:
                         raise
                 else:
-                    client, waiting = _blocked(project, args.herdr_bin)
+                    client, waiting = _blocked(project, args.herdr_bin, scope)
+                    if not waiting and not bootstrap_retried and any(
+                            record.get("bootstrap_pending") for role, record in binding(project).get("roles", {}).items()
+                            if role in scope):
+                        # A Codex packet that only got a notice while its composer was
+                        # starting is now ready; start submits it once through deliver().
+                        bootstrap_retried = True
+                        continue
                     if not waiting:
                         missing = [role["role"] for role in plan["roles"]
                                    if role["active"] and role["role"] not in result["roles"]]
@@ -501,9 +529,14 @@ def _launch_orca(plan: dict, args) -> dict | None:
             receive()
             # _blocked verified the original handle and read its current screen.
             # Opening a GUI is not a detach or a successful prompt submission.
-            client.open_ui(waiting[0][1]["pane_id"])
-            args.wizard_attached = True
-            print(tr("请在 Orca 中自行处理原生提示；处理后回到这里选择继续，原会话和选择保持不变。"), flush=True)
+            opened = client.open_ui(waiting[0][1]["pane_id"]) or {}
+            if opened.get("selected") is False:
+                args.wizard_attached = False  # An earlier selection does not cover this session.
+                print(tr("请打开 Rex 并选择会话 {session}（{reason}）。", session=opened["rex_session"], reason=opened["reason"]))
+            else:
+                args.wizard_attached = waiting[0][0] == "main"  # Otherwise the final attach returns to main.
+            print(tr("请在 Rex 中自行处理原生提示；处理后回到这里选择继续，原会话和选择保持不变。") if host == "rex" else
+                  tr("请在 Orca 中自行处理原生提示；处理后回到这里选择继续，原会话和选择保持不变。"), flush=True)
             try:
                 action = choose(tr("如何继续"), [tr("已处理原生提示，继续"), tr("结束向导，保留当前会话")])
             except (Cancelled, Back, EOFError, KeyboardInterrupt):
@@ -520,14 +553,16 @@ def launch(plan: dict, args) -> dict | None:
     """One startup worker progresses while the foreground TUI remains attached."""
     import threading
     from .client import HerdrError, notify
-    from .hosts import client_for_binding, identity_present, selected_host
+    from .hosts import GUI_HOSTS, client_for_binding, identity_present, selected_host
     from .runtime import attach, binding, save_binding, start
     from .receiver import ensure_receiver, stop as stop_receiver
     from .state import directory, launch_lock, write
-    if selected_host(binding(Path(plan["project"])), plan.get("host")) == "orca":
-        return _launch_orca(plan, args)
+    host = selected_host(binding(Path(plan["project"])), plan.get("host"))
+    if host in GUI_HOSTS:
+        return _launch_gui(plan, args, host)
     ui.set_language(getattr(args, "ui_language", ui.language))
     project = Path(plan["project"])
+    scope = {"main", *(role["role"] for role in plan["roles"] if role["active"])}
     print(tr("\n正在准备项目、ARIS 技能与所选角色…"), flush=True)
     with launch_lock(project):
         current = binding(project) or {"project": str(project), "session": plan["session"],
@@ -550,7 +585,7 @@ def launch(plan: dict, args) -> dict | None:
     def advance():
         try:
             while not stop_event.is_set():
-                client, waiting = _blocked(project, args.herdr_bin)
+                client, waiting = _blocked(project, args.herdr_bin, scope)
                 if waiting:
                     outcome["waiting"] = waiting
                     show_ui.set()
@@ -559,7 +594,7 @@ def launch(plan: dict, args) -> dict | None:
                         # The user may have resolved the native prompt while
                         # receiver setup was in flight. Decide from a fresh
                         # owner/UI check, not the pre-attach observation.
-                        _, waiting = _blocked(project, args.herdr_bin)
+                        _, waiting = _blocked(project, args.herdr_bin, scope)
                         if waiting:
                             break
                         continue
@@ -575,7 +610,7 @@ def launch(plan: dict, args) -> dict | None:
                     result = start(plan, args, stop_event=stop_event)
                 except HerdrError as exc:
                     write(directory(project) / "startup-error.json", {"error": str(exc)})
-                    _, waiting = _blocked(project, args.herdr_bin)
+                    _, waiting = _blocked(project, args.herdr_bin, scope)
                     if not waiting:
                         raise
                     outcome["waiting"] = waiting
@@ -584,7 +619,7 @@ def launch(plan: dict, args) -> dict | None:
                 ensure_receiving()
                 if stop_event.is_set():
                     break
-                _, waiting = _blocked(project, args.herdr_bin)
+                _, waiting = _blocked(project, args.herdr_bin, scope)
                 if waiting:
                     outcome["waiting"] = waiting
                     show_ui.set()

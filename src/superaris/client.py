@@ -227,7 +227,7 @@ def startup_target_diagnostic(client: Herdr, error: HerdrError, operation: str,
 
 
 def verify_owner(client: Herdr, role: dict, project: Path) -> dict:
-    if getattr(client, "host", None) == "orca":
+    if getattr(client, "host", None) in {"orca", "rex"}:
         return client.verify_owner(role, project)
     agent = client.json("agent", "get", role["pane_id"])["agent"]
     if agent.get("pane_id") != role["pane_id"] or agent.get("agent") != role["harness"]:
@@ -263,16 +263,20 @@ def read_screen(client, target: str) -> str:
             # Keep a pending UI composer draft visible to the same guard.
             return "› " + screen["draft"]
         return "\n".join(screen.get("tail", []))
+    if getattr(client, "host", None) == "rex":
+        return client.read_screen(target)
     return client.run("agent", "read", target, "--source", "visible", "--lines", "24")
 
 
-def send_prompt(client, target: str, text: str) -> dict:
+def send_prompt(client, target: str, text: str, owner: dict | None = None) -> dict:
+    if getattr(client, "host", None) == "rex":
+        return client.send_prompt(target, text, owner)  # Keys go only to the identity verified by the caller.
     if getattr(client, "host", None) == "orca":
         return client.send_prompt(target, text)
     return client.json("agent", "prompt", target, text)
 
 
 def notify(client, title: str, text: str) -> dict:
-    if getattr(client, "host", None) == "orca":
+    if getattr(client, "host", None) in {"orca", "rex"}:
         return client.notice(title, text)
     return client.json("notification", "show", title, "--body", text, "--sound", "none")

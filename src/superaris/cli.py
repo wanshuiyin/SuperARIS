@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -22,6 +23,9 @@ class _ArgumentParser(argparse.ArgumentParser):
                 # Resolve explicit paths in the invoking cwd, before execution
                 # changes to the project or pending startup is resumed elsewhere.
                 parsed.orca_bin = str(Path(parsed.orca_bin).expanduser().resolve())
+            if getattr(parsed, "rex_bin", None) and any(separator in parsed.rex_bin for separator in ("/", "\\")):
+                # Keep links such as Rex's Versions/Current so app updates stay reachable.
+                parsed.rex_bin = os.path.abspath(Path(parsed.rex_bin).expanduser())
             # Recovery can be opened from another cwd. Keep the wizard's
             # canonical prefix and serialize the parsed options unchanged.
             canonical = ["start", str(parsed.project.expanduser().resolve())]
@@ -124,8 +128,9 @@ def parser(prog: str = "superaris") -> argparse.ArgumentParser:
     s.add_argument("--name", help="readable new workbench name; existing owners are not renamed")
     s.add_argument("--plan", action="store_true", help="offline preview; no writes or processes")
     s.add_argument("--session", default="aris", help="explicit local Herdr session (default: aris)")
-    s.add_argument("--host", choices=("herdr", "orca"), help="new-project workbench; existing projects keep their original host")
+    s.add_argument("--host", choices=("herdr", "orca", "rex"), help="new-project workbench; existing projects keep their original host")
     s.add_argument("--orca-bin", help="explicit official Orca CLI launcher; otherwise discover the installed app")
+    s.add_argument("--rex-bin", help="explicit Rex CLI; otherwise use PATH or the installed app's bundled CLI")
     s.add_argument("--owner", help="explicit existing main agent name/pane to adopt after verification")
     s.add_argument("--preset", choices=PRESETS, help="new-team mapping (default: codex); reconnect preserves the recorded team")
     s.add_argument("--role", action="append", default=[], metavar="ROLE=HARNESS")
